@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.navigation.mapper.UserMapper">
+    <update id="update" parameterType="com.navigation.entity.User">
+        update user
+        <set>
+            <if test="nickname!=null"> nickname=#{nickname}, </if>
+            <if test="username!=null"> username=#{username}, </if>
+            <if test="password!=null "> password=#{password}, </if>
+            <if test="age!=null and age!=0"> age=#{age}, </if>
+            <if test="gender!=null"> gender=#{gender}, </if>
+            <if test="telephone!=null"> telephone=#{telephone}, </if>
+            <if test="status!=null"> status=#{status}, </if>
+            <if test="updateTime!=null"> update_time=#{updateTime} </if>
+        </set>
+        where id=#{id}
+    </update>
+</mapper>
