@@ -21,5 +21,4 @@ public class User {
     @JsonFormat(pattern = "YYYY-MM-dd")
     LocalDateTime updateTime;
 
-
 }
