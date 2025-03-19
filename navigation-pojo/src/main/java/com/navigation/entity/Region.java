@@ -1,4 +1,4 @@
 package com.navigation.entity;
 
-public class User {
+public class Region {
 }
