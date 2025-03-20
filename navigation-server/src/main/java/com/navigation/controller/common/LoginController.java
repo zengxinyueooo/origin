@@ -1,7 +1,6 @@
 package com.navigation.controller.common;
 
 import com.navigation.dto.LoginDto;
-import com.navigation.entity.User;
 import com.navigation.mapper.UserMapper;
 import com.navigation.result.Result;
 import com.navigation.service.UserService;
@@ -27,21 +26,22 @@ public class LoginController {
 
     public Result userLogin(@RequestBody LoginDto loginDto) {
 
-        log.info("用户登录：{}", loginDto);
-        User user = userService.login(loginDto);
-        if(userMapper.exist(loginDto.getUsername()) == null){
-            return Result.error("账号错误");
-        }
-        if(user == null) {
-            return Result.error("用户名或密码错误");
-        }
-        String token = JwtUtil.createToken(String.valueOf(user.getId()));
-
-        UserLoginVo userLoginVo = new UserLoginVo();
-        userLoginVo.setId(user.getId());
-        userLoginVo.setUsername(user.getUsername());
-        userLoginVo.setToken(token);
-
+//        log.info("用户登录：{}", loginDto);
+//        User user = userService.login(loginDto);
+//        if(userMapper.exist(loginDto.getUsername()) == null){
+//            return Result.error("账号错误");
+//        }
+//        if(user == null) {
+//            return Result.error("用户名或密码错误");
+//        }
+//        String token = JwtUtil.createToken(String.valueOf(user.getId()));
+//
+//        UserLoginVo userLoginVo = new UserLoginVo();
+//        userLoginVo.setId(user.getId());
+//        userLoginVo.setUsername(user.getUsername());
+//        userLoginVo.setToken(token);
+//
+        Object userLoginVo = null;
         return Result.success(userLoginVo);
     }
 }

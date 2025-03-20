@@ -19,13 +19,13 @@ import java.util.List;
 @RequestMapping("/users")
 @ApiModel("用户注册")
 public class UserController {
-    @Autowired
-    private UserService userService;
-
-    @PostMapping("/1")
-    @ApiOperation("用户注册")
-    public Result register(LoginDto loginDto){
-        userService.register(loginDto);
-        return Result.success();
-    }
+//    @Autowired
+//    private UserService userService;
+//
+//    @PostMapping("/1")
+//    @ApiOperation("用户注册")
+////    public Result register(LoginDto loginDto){
+////        userService.register(loginDto);
+////        return Result.success();
+////    }
 }
