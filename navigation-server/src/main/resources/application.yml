@@ -21,15 +21,15 @@ spring:
     mvc:
       pathmatch:
         matching-strategy: ant_path_matcher
-#
+
 #logging:
 #  level:
 #    com.navigation: debug
 #  pattern:
 #    dateformat: HH:mm:ss:SSS
-#logging:
-#  level:
-#    root: DEBUG
+logging:
+  level:
+    root: DEBUG
 
 
 
