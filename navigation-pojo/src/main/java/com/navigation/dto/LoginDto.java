@@ -2,11 +2,17 @@ package com.navigation.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
- * 数据传输对象（DTO）
+ * 用户登录 DTO
  */
 @Data
 public class LoginDto {
-    String username;
-    String password;
+
+    @NotBlank(message = "用户名或邮箱不能为空")
+    private String usernameOrEmail; // 用户名或邮箱（允许用户使用邮箱或用户名登录）
+
+    @NotBlank(message = "密码不能为空")
+    private String password; // 密码
 }

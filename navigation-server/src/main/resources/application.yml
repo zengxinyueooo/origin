@@ -7,6 +7,17 @@ spring:
         url: jdbc:mysql://localhost:3306/mysql_travel?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
         username: root
         password: 123456
+    mail:
+      protocol: smtp # 邮件协议
+      host: smtp.163.com #网易邮箱 smtp 服务器地址
+      port: 25
+      username: 18794295151@163.com  #发件人邮箱地址
+      password: YJaPC9HSPpNh3mVF #授权码
+      default-encoding: UTF-8 #编码字符集
+      properties:
+        mail:
+          debug:true #开启debug后，会完整打印邮件发送过程的日志
+
     mvc:
       pathmatch:
         matching-strategy: ant_path_matcher

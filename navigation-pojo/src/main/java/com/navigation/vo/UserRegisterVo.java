@@ -1,13 +1,12 @@
 package com.navigation.vo;
 
-
 import lombok.Data;
 
 /**
- * 用户登录 VO（返回给前端的数据）
+ * 用户注册 VO
  */
 @Data
-public class UserLoginVo {
+public class UserRegisterVo {
 
     private Integer userId; // 用户ID
 
@@ -17,7 +16,7 @@ public class UserLoginVo {
 
     private String email; // 邮箱
 
-    private String role; // 用户角色（user/admin）
+    private String role; // 用户角色（默认 user）
 
-    private String token; // 认证 Token（JWT）
+    private String message = "注册成功"; // 提示消息
 }
