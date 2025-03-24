@@ -24,6 +24,9 @@ public class Hotel {
 
     private String hotelName; // 酒店名称
 
+    private String description; // 酒店描述，提供更多酒店信息和特点
+
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime; // 创建时间
 

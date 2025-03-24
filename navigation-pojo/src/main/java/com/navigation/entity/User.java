@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class User {
     private Integer userId; // 用户ID
 
-    private String userName; // 用户名，唯一标识用户
+
 
     private String nickName; // 昵称
 
