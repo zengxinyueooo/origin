@@ -1,17 +1,10 @@
 package com.navigation.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
-import com.navigation.dto.LoginDto;
-import com.navigation.exception.AccountExist;
-import com.navigation.mapper.UserMapper;
+import com.navigation.entity.User;
 import com.navigation.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
-import java.time.LocalDateTime;
-
-import static com.navigation.constant.MessageConstant.USER_NICK_NAME_PREFIX;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -43,5 +36,19 @@ public class UserServiceImpl implements UserService {
 //            throw new AccountExist("账号已被占用,请重新填写");
 //        }
 //    }
+
+    /**
+     *
+     * 注册账号
+     * @param user
+     * @return
+     */
+//      @Override
+//      public Map<String,Object> createAccount(User user){
+//
+//
+//      }
+
+
 
 }

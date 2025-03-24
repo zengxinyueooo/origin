@@ -18,6 +18,8 @@ public class Manager {
 
     private String userName; // 管理员账号名
 
+    private String managerPassword;// 管理员账号密码
+
     private String role; // 角色字段：'user' 代表普通用户，'admin' 代表管理员
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
