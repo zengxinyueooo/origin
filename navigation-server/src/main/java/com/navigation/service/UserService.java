@@ -1,11 +1,23 @@
 package com.navigation.service;
 
 import com.navigation.dto.LoginDto;
+import com.navigation.dto.RegisterDto;
 import com.navigation.entity.User;
 
 import java.util.Map;
 
 public interface UserService {
+
+    /**
+     * 注册用户的方法
+     * @param registerDto 注册信息数据传输对象
+     * @return 操作结果（成功或失败）和附加信息
+     */
+    Map<String, Object> RegisterUser(RegisterDto registerDto);
+
+
+
+
     //    @Autowired
     //    private UserMapper userMapper;
     //    private String password;

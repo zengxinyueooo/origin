@@ -15,6 +15,7 @@ import com.navigation.result.Result;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @CrossOrigin
@@ -34,25 +35,41 @@ public class UserController {
 ////    }
     @Autowired
     private UserService userService;
-    @PostMapping("/login")
+    @GetMapping("/login")
     @ApiOperation("用户登录")
-    public Result userLogin(@RequestBody LoginDto loginDto){
+    public String userLogin(@RequestBody LoginDto loginDto){
         UserLoginVo userLoginVo = new UserLoginVo();
-        return Result.success(userLoginVo);
+        return "hello";
     }
+
+
+//    @PostMapping("/register")
+//    @ApiOperation("用户注册")
+//    public Map<String,Object> RegisterUser(@RequestBody RegisterDto registerDto) {
+//        // 调用 UserService 进行注册逻辑
+//        boolean isRegistered = userService.RegisterUser(registerDto).isEmpty();
+//        if (isRegistered) {
+//            return Map.of("status", "success", "message", "注册成功");
+//        } else {
+//            return Map.of("status", "failure", "message", "注册失败");
+//        }
+//
+//        }
     @PostMapping("/register")
     @ApiOperation("用户注册")
-    public Result register(@RequestBody RegisterDto registerDto) {
+    public Map<String, Object> RegisterUser(@RequestBody RegisterDto registerDto) {
         // 调用 UserService 进行注册逻辑
-//        boolean isRegistered = userService.register(registerDto);
-//
-//        if (isRegistered) {
-//            return Result.success("注册成功");
-//        } else {
-//            return Result.failure("注册失败");
-        UserRegisterVo userRegisterVo = new UserRegisterVo();
-        return Result.success(userRegisterVo);
+        Map<String, Object> result = userService.RegisterUser(registerDto);
+
+        // 如果 result 为 null 或为空，表示注册失败
+        if (result == null || result.isEmpty()) {
+            return Map.of("status", "failure", "message", "注册失败");
+        } else {
+            return Map.of("status", "success", "message", "注册成功");
         }
+    }
+
+
 
 
 }

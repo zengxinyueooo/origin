@@ -1,36 +1,50 @@
 package com.navigation.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 /**
  * 用户注册 DTO
  */
 @Data
+@ApiModel("用户注册请求参数")
 public class RegisterDto {
 
-    @NotBlank(message = "用户名不能为空")
-    @Size(min = 3, max = 20, message = "用户名长度必须在3-20个字符之间")
-    private String userName; // 用户名
-
+    @ApiModelProperty(value = "昵称", required = true)
     @NotBlank(message = "昵称不能为空")
-    private String nickName; // 昵称
+    private String nickName;
 
+    @ApiModelProperty(value = "邮箱", required = true)
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
-    private String email; // 邮箱
+    private String email;
 
+    @ApiModelProperty(value = "密码", required = true)
     @NotBlank(message = "密码不能为空")
-    @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
-    private String password; // 密码（前端明文传输，后端加密存储）
+    @Size(min = 6, message = "密码长度不能小于6位")
+    private String password;
 
-    @NotBlank(message = "确认密码不能为空")
-    private String confirmPassword; // 确认密码（需要在服务层验证）
+    @ApiModelProperty(value = "用户年龄", required = true)
+    @NotNull(message = "年龄不能为空")
+    private Integer age;
 
-    private String gender; // 性别（可选）
+    @ApiModelProperty(value = "性别 (M: 男, F: 女)", required = true)
+    @NotBlank(message = "性别不能为空")
+    private String gender;
 
-    private Integer age; // 年龄（可选）
+    @ApiModelProperty(value = "确认码", required = false)
+    private String confirmCode;  // 确认码
+
+    @ApiModelProperty(value = "激活失效时间", required = false)
+    private LocalDateTime activationTime;  // 激活失效时间
+
+    @ApiModelProperty(value = "账号是否有效", required = false)
+    private Integer isValid;  // 是否有效
 }

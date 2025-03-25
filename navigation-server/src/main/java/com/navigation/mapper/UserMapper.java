@@ -10,9 +10,8 @@ public interface UserMapper {
      * @param user
      * @return
      */
-
-    @Insert("INSERT INTO user (nick_name, email, password, salt, age, gender, activation_time, create_time, is_vaild, confirm_code, update_time, head, role) " +
-            "VALUES (#{nickName}, #{email}, #{password}, #{salt}, #{age}, #{gender}, #{activationTime}, #{createTime}, #{isVaild}, #{confirmCode}, #{updateTime}, #{head}, #{role})")
+    @Insert("INSERT INTO user (nick_name, email, password, salt, age, gender, activation_time, create_time, is_valid, confirm_code, update_time, head, role) " +
+            "VALUES (#{nickName}, #{email}, #{password}, #{salt}, #{age}, #{gender}, #{activationTime}, #{createTime}, #{isValid}, #{confirmCode}, #{updateTime}, #{head}, #{role})")
     int insertUser(User user);
 
     /**
@@ -20,7 +19,7 @@ public interface UserMapper {
      * @param confirmCode
      * @return
      */
-    @Select("SELECT email,activation_time FROM user WHERE confirm_code =#{confirmCode} AND is_vaild=0")
+    @Select("SELECT email, activation_time FROM user WHERE confirm_code = #{confirmCode} AND is_valid = 0")
     User selectUserByConfirmCode(@Param("confirmCode") String confirmCode);
 
     /**
@@ -28,25 +27,14 @@ public interface UserMapper {
      * @param confirmCode
      * @return
      */
-    @Update("UPDATE user SET is_valid =1 WHERE confirm_code =#{confirmCode}")
+    @Update("UPDATE user SET is_valid = 1 WHERE confirm_code = #{confirmCode}")
     int updateUserByConfirmCode(@Param("confirmCode") String confirmCode);
 
-//    @Select()
-
-
-
-
-
-
-//    @Select("select * from navigation_system.user where username = #{username} " +
-//            "and password = #{password}")
-//    User login(String username, String password);
-//    @Insert("insert into user (nickname, username, password, gender, age, telephone, status, create_time,  update_time) VALUES " +
-//                             "(#{nickname},#{username},#{password},#{gender},#{age},#{telephone},#{status},#{createTime},#{updateTime})")
-//    void register(User user);
-//
-//    void update(User user);
-//
-//    @Select("select * from user where username = #{username}")
-//    User exist(String username);
+    /**
+     * 根据邮箱查询账户
+     * @param email
+     * @return
+     */
+    @Select("SELECT * FROM user WHERE email = #{email} AND is_valid = 1")
+    User selectUserByEmail(@Param("email") String email);
 }
