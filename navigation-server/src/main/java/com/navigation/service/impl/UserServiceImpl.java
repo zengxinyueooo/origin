@@ -3,6 +3,7 @@ package com.navigation.service.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.navigation.dto.LoginDto;
 import com.navigation.dto.RegisterDto;
 import com.navigation.entity.User;
 import com.navigation.mapper.UserMapper;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,12 +28,12 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 注册账号
-     * @param registerDto 注册信息数据传输对象
+     * @param registerDto
      * @return
      */
     @Transactional
     public Map<String, Object> RegisterUser(RegisterDto registerDto) {
-        // 1. 检查邮箱是否已存在
+        // 检查邮箱是否已存在
         User existingUser = userMapper.selectUserByEmail(registerDto.getEmail());
         if (existingUser != null) {
             Map<String, Object> resultMap = new HashMap<>();
@@ -40,25 +42,25 @@ public class UserServiceImpl implements UserService {
             return resultMap;
         }
 
-        // 2. 雪花算法生成确认码
+        // 雪花算法生成确认码
         String confirmCode = IdUtil.getSnowflake(1, 1).nextIdStr();
 
-        // 3. 生成盐值（随机字符串）
+        // 生成盐值（随机字符串）
         String salt = RandomUtil.randomString(6);
 
-        // 4. 加密密码：原始密码 + 盐
+        // 加密密码：原始密码 + 盐
         String md5Pwd = SecureUtil.md5(registerDto.getPassword() + salt);
 
-        // 5. 激活失效时间：24小时后
+        // 激活失效时间：24小时后
         LocalDateTime ldt = LocalDateTime.now().plusDays(1);
 
-        // 6. 设置 DTO 中的数据
+        // 设置 DTO 中的数据
         registerDto.setPassword(md5Pwd);  // 密码加密
         registerDto.setConfirmCode(confirmCode);
         registerDto.setActivationTime(ldt);
         registerDto.setIsValid(0);
 
-        // 7. 创建 User 对象
+        // 创建 User 对象
         User user = new User();
         user.setNickName(registerDto.getNickName());
         user.setEmail(registerDto.getEmail());
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService {
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
 
-        // 8. 新增账号并捕获可能的异常
+        // 新增账号并捕获可能的异常
         Map<String, Object> resultMap = new HashMap<>();
         try {
             // 插入之前先再次检查邮箱是否存在
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
             int result = userMapper.insertUser(user);
 
-            // 9. 注册成功，返回成功信息
+            // 注册成功，返回成功信息
             if (result > 0) {
                 resultMap.put("status", "success");
                 resultMap.put("message", "注册成功");
@@ -108,4 +110,37 @@ public class UserServiceImpl implements UserService {
         // 返回结果
         return resultMap;
     }
+
+    /**
+     * 登录账号
+     * @param loginDto
+     * @return
+     */
+    public Map<String, Object> LoginUser(LoginDto loginDto) {
+        Map<String, Object> resultMap = new HashMap<>();
+        //根据邮箱查询账户
+        User user = userMapper.selectUserByEmail(loginDto.getEmail());
+        //查询不到结果，返回：该账户不存在或未激活
+        if(user == null||user.getIsValid() == 0) {
+            resultMap.put("code",400);
+            resultMap.put("message","该账户不存在或未激活");
+            return resultMap;
+        }
+        //查询到一个账户，进行密码比对
+
+        //用户输入的密码和盐进行加密
+        String md5Pwd = SecureUtil.md5(loginDto.getPassword() + user.getSalt());
+        //密码不一致，返回：用户名或密码错误
+        if (!md5Pwd.equals(user.getPassword())) {
+            resultMap.put("code", 400);
+            resultMap.put("message", "用户名或密码错误");
+            return resultMap;
+        }
+        // 登录成功，返回成功信息
+        resultMap.put("code", 200);
+        resultMap.put("message", "登录成功");
+
+        return resultMap;
+    }
+
 }
