@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.navigation.mapper.RegionMapper">
+
+   <!-- <insert id="save" parameterType="com.navigation.entity.region" useGeneratedKeys="true" keyProperty="id">
+        insert into region (region_name, region_cover, location, region_description, max_capacity, open_start_time, open_end_time)
+        values (#{regionName}, #{regionCover}, #{location}, #{regionDescription},
+        #{maxCapacity}, #{openStartTime}, #{openEndTime})
+    </insert>-->
+
+
+    <update id="update" parameterType="com.navigation.entity.Region">
+        UPDATE region
+        <set>
+            <if test="regionName != null">region_name = #{regionName},</if>
+            <if test="regionDescription != null">region_description = #{regionDescription},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE region_id = #{regionId}
+    </update>
+
+    <delete id="batchDelete">
+        DELETE FROM region
+        WHERE region_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.navigation.mapper.TicketMapper">
+
+   <!-- <insert id="save" parameterType="com.navigation.entity.scenic" useGeneratedKeys="true" keyProperty="id">
+        insert into scenic (scenic_name, scenic_cover, location, scenic_description, max_capacity, open_start_time, open_end_time)
+        values (#{scenicName}, #{scenicCover}, #{location}, #{scenicDescription},
+        #{maxCapacity}, #{openStartTime}, #{openEndTime})
+    </insert>-->
+
+
+    <update id="update" parameterType="com.navigation.entity.Ticket">
+        UPDATE ticket
+        <set>
+            <if test="scenicSpotId != null">scenic_spot_id = #{scenicSpotId},</if>
+            <if test="ticketType != null">ticket_type = #{ticketType},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="availability != null">availability = #{availability},</if>
+            <if test="validFrom != null">valid_from = #{validFrom},</if>
+            <if test="validTo != null">valid_to = #{validTo},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            version = version + 1
+        </set>
+        where id = #{id} and version = #{version}
+    </update>
+
+    <delete id="batchDelete">
+        DELETE FROM ticket
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

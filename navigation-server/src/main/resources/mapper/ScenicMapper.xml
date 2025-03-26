@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.navigation.mapper.ScenicMapper">
+
+   <!-- <insert id="save" parameterType="com.navigation.entity.scenic" useGeneratedKeys="true" keyProperty="id">
+        insert into scenic (scenic_name, scenic_cover, location, scenic_description, max_capacity, open_start_time, open_end_time)
+        values (#{scenicName}, #{scenicCover}, #{location}, #{scenicDescription},
+        #{maxCapacity}, #{openStartTime}, #{openEndTime})
+    </insert>-->
+
+
+    <update id="update" parameterType="com.navigation.entity.Scenic">
+        UPDATE scenic
+        <set>
+            <if test="scenicName != null">scenic_name = #{scenicName},</if>
+            <if test="scenicCover != null">scenic_cover = #{scenicCover},</if>
+            <if test="scenicStatus != null">scenic_status = #{scenicStatus},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="scenicDescription != null">scenic_description = #{scenicDescription},</if>
+            <if test="maxCapacity != null">max_capacity = #{maxCapacity},</if>
+            <if test="openStartTime != null">open_start_time = #{openStartTime},</if>
+            <if test="openEndTime != null">open_end_time = #{openEndTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="batchDelete">
+        DELETE FROM scenic
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

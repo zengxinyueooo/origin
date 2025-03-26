@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.navigation.mapper.TicketReservationMapper">
+
+   <!-- <insert id="save" parameterType="com.navigation.entity.Ticket" useGeneratedKeys="true" keyProperty="id">
+        insert into Ticket (Ticket_name, Ticket_cover, location, Ticket_description, max_capacity, open_start_time, open_end_time)
+        values (#{TicketName}, #{TicketCover}, #{location}, #{TicketDescription},
+        #{maxCapacity}, #{openStartTime}, #{openEndTime})
+    </insert>-->
+
+
+    <update id="update" parameterType="com.navigation.entity.TicketReservation">
+        UPDATE ticket_reservation
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="ticketId != null">ticket_id = #{ticketId},</if>
+            <if test="reservationTime != null">reservation_time = #{reservationTime},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE reservation_id = #{reservationId}
+    </update>
+
+    <delete id="batchDelete">
+        DELETE FROM ticket_reservation
+        WHERE reservation_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
