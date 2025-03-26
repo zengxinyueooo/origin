@@ -1,27 +1,40 @@
 package com.navigation.mapper;
 
 import com.navigation.entity.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserMapper {
+    /**
+     * 新增账号
+     * @param user
+     * @return
+     */
+    @Insert("INSERT INTO user (nick_name, email, password, salt, age, gender, activation_time, create_time, is_valid, confirm_code, update_time, head, role) " +
+            "VALUES (#{nickName}, #{email}, #{password}, #{salt}, #{age}, #{gender}, #{activationTime}, #{createTime}, #{isValid}, #{confirmCode}, #{updateTime}, #{head}, #{role})")
+    int insertUser(User user);
 
-    @Select("select * from navigation_system.user where username = #{username} " +
-            "and password = #{password}")
-    User login(String username, String password);
-    @Insert("insert into user (nickname, username, password, gender, age, telephone, status, create_time,  update_time) VALUES " +
-                             "(#{nickname},#{username},#{password},#{gender},#{age},#{telephone},#{status},#{createTime},#{updateTime})")
-    void register(User user);
+    /**
+     * 根据确认码查询用户
+     * @param confirmCode
+     * @return
+     */
+    @Select("SELECT email, activation_time FROM user WHERE confirm_code = #{confirmCode} AND is_valid = 0")
+    User selectUserByConfirmCode(@Param("confirmCode") String confirmCode);
 
-    void update(User user);
+    /**
+     * 根据确认码查询用户并修改状态值为1（可用）
+     * @param confirmCode
+     * @return
+     */
+    @Update("UPDATE user SET is_valid = 1 WHERE confirm_code = #{confirmCode}")
+    int updateUserByConfirmCode(@Param("confirmCode") String confirmCode);
 
-    @Select("select * from user where username = #{username}")
-    User exist(String username);
+    /**
+     * 根据邮箱查询账户
+     * @param email
+     * @return
+     */
+    @Select("SELECT * FROM user WHERE email = #{email} AND is_valid = 1")
+    User selectUserByEmail(@Param("email") String email);
 }
