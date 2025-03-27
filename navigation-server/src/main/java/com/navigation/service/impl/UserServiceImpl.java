@@ -7,11 +7,13 @@ import com.navigation.dto.LoginDto;
 import com.navigation.dto.RegisterDto;
 import com.navigation.entity.User;
 import com.navigation.mapper.UserMapper;
+import com.navigation.service.MailService;
 import com.navigation.service.UserService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,9 @@ import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Resource
+    private MailService mailService;
 
     private UserMapper userMapper;
 
@@ -90,6 +95,11 @@ public class UserServiceImpl implements UserService {
 
             // 注册成功，返回成功信息
             if (result > 0) {
+                String activationUrl ="localhost:8080/users/activation?confirmCode="+confirmCode;
+                System.out.println(activationUrl);
+                mailService.sendMailForActivationAccount(activationUrl, user.getEmail());
+
+
                 resultMap.put("status", "success");
                 resultMap.put("message", "注册成功");
             } else {
@@ -141,6 +151,36 @@ public class UserServiceImpl implements UserService {
         resultMap.put("message", "登录成功");
 
         return resultMap;
+    }
+
+    /**
+     * 激活账号
+     * @param confirmCode
+     * @return
+     */
+    public Map<String, Object> activationAccount(String confirmCode) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+        User user = userMapper.selectUserByConfirmCode(confirmCode);
+        boolean after=LocalDateTime.now().isAfter(user.getActivationTime());
+        if(after) {
+            resultMap.put("code",400);
+            resultMap.put("message","链接已失效,请重新注册");
+            return resultMap;
+
+
+        }
+        int result = userMapper.updateUserByConfirmCode(confirmCode);
+        if (result>0){
+            resultMap.put("code",200);
+            resultMap.put("message","激活成功");
+
+        }else {
+            resultMap.put("code",400);
+            resultMap.put("message","激活失败");
+        }
+        return resultMap;
+
     }
 
 }

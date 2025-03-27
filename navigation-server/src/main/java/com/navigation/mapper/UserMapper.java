@@ -37,4 +37,5 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM user WHERE email = #{email} AND is_valid = 1")
     User selectUserByEmail(@Param("email") String email);
+
 }

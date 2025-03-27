@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.navigation.result.Result;
 
@@ -25,8 +26,8 @@ import java.util.Map;
 @Api(tags = "用户操作")
 public class UserController {
 
-@Autowired
-private UserService userService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping ("/login")
     @ApiOperation("用户登录")
@@ -47,6 +48,18 @@ private UserService userService;
         } else {
             return result;
         }
+    }
+
+    /**
+     * 激活账号
+     * @param confirmCode
+     * @return
+     */
+    @GetMapping("/activation")
+    @ApiOperation("账号激活")
+    public Map<String, Object> activationAccount(String confirmCode){
+
+        return userService.activationAccount(confirmCode);
     }
 
 

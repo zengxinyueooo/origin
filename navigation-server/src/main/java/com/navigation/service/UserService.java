@@ -22,4 +22,10 @@ public interface UserService {
      */
     Map<String, Object> LoginUser(LoginDto loginDto);
 
+    /**
+     * 账号激活
+     * @param confirmCode
+     * @return
+     */
+    Map<String, Object> activationAccount(String confirmCode);
 }
