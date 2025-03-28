@@ -45,7 +45,7 @@ public class ScenicController {
     }
 
     @GetMapping("/queryById")
-    public Scenic queryScenicById(Integer id){
+    public Result<Scenic> queryScenicById(Integer id){
         return scenicService.queryScenicById(id);
     }
 

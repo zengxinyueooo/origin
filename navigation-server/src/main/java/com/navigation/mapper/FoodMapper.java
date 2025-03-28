@@ -3,6 +3,7 @@ package com.navigation.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.navigation.entity.Food;
 import com.navigation.entity.Food;
+import com.navigation.entity.Region;
 import com.navigation.entity.Scenic;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,4 +34,12 @@ public interface FoodMapper extends BaseMapper<Food> {
 
     @Select("select * from food where region_id = #{regionId}")
     List<Food> queryFoodByRegionId(Integer id);
+
+    @Select("SELECT COUNT(*) FROM region WHERE region_id = #{regionId}")
+    int countFoodById(Integer regionId);
+
+    @Select("SELECT food_id FROM food")
+    List<Integer> getAllExistingIds();
+
+
 }

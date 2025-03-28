@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -23,7 +24,7 @@ public class Food {
     @TableId(value = "food_id", type = IdType.AUTO)
     private Integer foodId; // 美食ID
 
-    @NotBlank(message = "地区ID不能为空")
+    @NotNull(message = "地区ID不能为空")
     private Integer regionId; // 地区ID，外键，关联到地区表的region_id
 
     @NotBlank(message = "美食名称不能为空")

@@ -43,7 +43,7 @@ public class TicketReservationController {
     }
 
     @GetMapping("/queryById")
-    public TicketReservation queryTicketReservationById(Integer id){
+    public Result<TicketReservation> queryTicketReservationById(Integer id){
         return ticketReservationService.queryTicketReservationById(id);
     }
 

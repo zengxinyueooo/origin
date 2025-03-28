@@ -30,4 +30,12 @@ public interface RegionMapper extends BaseMapper<Region> {
 
     @Select("select * from region ")
     List<Region> queryRegion(Integer pageNum, Integer pageSize);
+
+    @Select("SELECT COUNT(*) FROM region WHERE region_id = #{id}")
+    int countRegionById(Integer id);
+
+    @Select("SELECT region_id FROM region")
+    List<Integer> getAllExistingRegionIds();
+
+
 }

@@ -19,5 +19,5 @@ public interface ScenicReservationService extends IService<ScenicReservation> {
     PageResult queryScenicReservation(Integer pageNum, Integer pageSize);
 
 
-    ScenicReservation queryScenicReservationById(Integer id);
+    Result<ScenicReservation> queryScenicReservationById(Integer id);
 }

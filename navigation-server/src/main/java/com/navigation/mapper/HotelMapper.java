@@ -30,4 +30,10 @@ public interface HotelMapper extends BaseMapper<Hotel> {
 
     @Select("select * from hotel ")
     List<Hotel> queryHotel(Integer pageNum, Integer pageSize);
+
+    @Select("SELECT COUNT(*) FROM hotel WHERE id = #{id}")
+    int countHotelById(Integer id);
+
+    @Select("SELECT id FROM hotel")
+    List<Integer> getAllExistingHotelIds();
 }

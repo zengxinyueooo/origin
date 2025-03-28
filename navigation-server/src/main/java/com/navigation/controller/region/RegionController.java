@@ -48,7 +48,7 @@ public class RegionController {
     }
 
     @GetMapping("/queryById")
-    public Region queryRegionById(Integer id){
+    public Result<Region> queryRegionById(Integer id){
         return regionService.queryRegionById(id);
     }
 

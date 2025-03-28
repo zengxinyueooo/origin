@@ -19,5 +19,5 @@ public interface ScenicService extends IService<Scenic> {
     PageResult queryScenic(Integer pageNum, Integer pageSize);
 
 
-    Scenic queryScenicById(Integer id);
+    Result<Scenic> queryScenicById(Integer id);
 }

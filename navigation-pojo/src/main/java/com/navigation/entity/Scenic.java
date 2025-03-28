@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -38,14 +39,14 @@ public class Scenic {
     @NotBlank(message = "景区描述不能为空")
     private String scenicDescription;
 
-    @NotBlank(message = "景区最大容量不能为空")
+    @NotNull(message = "景区最大容量不能为空")
     private int maxCapacity;
 
-    @NotBlank(message = "景区开放时间不能为空")
+    @NotNull(message = "景区开放时间不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")  // 注意格式中的空格和大小写
     private LocalDateTime openStartTime;
 
-    @NotBlank(message = "景区关闭时间不能为空")
+    @NotNull(message = "景区关闭时间不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime openEndTime;
 

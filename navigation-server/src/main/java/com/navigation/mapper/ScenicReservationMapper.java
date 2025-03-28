@@ -31,4 +31,19 @@ public interface ScenicReservationMapper extends BaseMapper<ScenicReservation> {
 
     @Select("select * from scenic_reservation where reservation_id = #{reservationId}")
     ScenicReservation queryScenicReservationById(Integer id);
+
+    // 获取指定景点的所有预约记录的总人数
+    @Select("SELECT SUM(people_count) FROM scenic_reservation WHERE scenic_id = #{scenicId}")
+    int getTotalPeopleCountByScenicId(Integer scenicId);
+
+    // 获取数据库中所有存在的ID列表
+    @Select("SELECT reservation_id FROM scenic_reservation")
+    List<Integer> getAllExistingIds();
+
+    @Select("select * from scenic_reservation where user_id = #{userId} and scenic_id = #{scenicId}")
+    ScenicReservation getByUserIdAndScenicId(Integer userId, Integer scenicId);
+
+    @Select("SELECT COUNT(1) FROM scenic_reservation WHERE user_id = #{userId} AND scenic_id = #{scenicId}")
+    boolean existsByUserIdAndScenicId(Integer userId, Integer scenicId);
+
 }

@@ -31,4 +31,13 @@ public interface ScenicMapper extends BaseMapper<Scenic> {
 
     @Select("select * from scenic where id = #{id}")
     Scenic queryScenicById(Integer id);
+
+    @Select("SELECT max_capacity FROM scenic WHERE id = #{id}")
+    int getMaxCapacityByScenicId(Integer scenicId);
+
+    @Select("SELECT id FROM scenic")
+    List<Integer> getAllExistingIds();
+
+    @Select("SELECT COUNT(1) FROM scenic WHERE id = #{id}")
+    int countScenicById(Integer scenicId);
 }

@@ -19,5 +19,5 @@ public interface RegionService extends IService<Region> {
     PageResult queryRegion(Integer pageNum, Integer pageSize);
 
 
-    Region queryRegionById(Integer id);
+    Result<Region> queryRegionById(Integer id);
 }

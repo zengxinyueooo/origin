@@ -45,7 +45,7 @@ public class ScenicReservationController {
     }
 
     @GetMapping("/queryById")
-    public ScenicReservation queryScenicReservationById(Integer id){
+    public Result<ScenicReservation> queryScenicReservationById(Integer id){
         return scenicReservationService.queryScenicReservationById(id);
     }
 

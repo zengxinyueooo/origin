@@ -46,7 +46,7 @@ public class HotelController {
     }
 
     @GetMapping("/queryById")
-    public Hotel queryHotelById(Integer id){
+    public Result<Hotel> queryHotelById(Integer id){
         return hotelService.queryHotelById(id);
     }
 

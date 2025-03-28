@@ -45,12 +45,12 @@ public class FoodController {
     }
 
     @GetMapping("/queryByRegionId")
-    public List<Food> queryFoodByRegionId(Integer id){
+    public Result<List<Food>> queryFoodByRegionId(Integer id){
         return foodService.queryFoodByRegionId(id);
     }
 
     @GetMapping("/queryById")
-    public Food queryFoodById(Integer id){
+    public Result<Food> queryFoodById(Integer id){
         return foodService.queryFoodById(id);
     }
 

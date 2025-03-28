@@ -31,4 +31,11 @@ public interface TicketReservationMapper extends BaseMapper<TicketReservation> {
 
     @Update("UPDATE ticket_reservation SET status = 1 WHERE reservation_id = #{reservationId}")
     int updateStatusById(Integer reservationId);
+
+    @Select("SELECT COUNT(1) FROM ticket_reservation WHERE user_id = #{userId} AND ticket_id = #{ticketId}")
+    boolean existsByUserIdAndTicketId(Integer userId, Integer ticketId);
+
+    // 获取数据库中所有存在的ID列表
+    @Select("SELECT reservation_id FROM ticket_reservation")
+    List<Integer> getAllExistingIds();
 }

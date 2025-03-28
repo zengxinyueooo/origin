@@ -47,6 +47,18 @@ public class UserController {
         }
     }
 
+    /**
+     * 激活账号
+     * @param confirmCode
+     * @return
+     */
+    @GetMapping("/activation")
+    @ApiOperation("账号激活")
+    public Map<String, Object> activationAccount(String confirmCode){
+
+        return userService.activationAccount(confirmCode);
+    }
+
 
 
 

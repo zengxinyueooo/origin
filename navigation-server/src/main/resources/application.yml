@@ -19,6 +19,15 @@ spring:
         mail:
           debug:true #开启debug后，会完整打印邮件发送过程的日志
 
+
+    thymeleaf:
+      prefix: classpath:/templates/  # 模板文件存放的路径
+      suffix: .html  # 模板文件的扩展名
+      mode: HTML  # 模板的模式，通常是 HTML
+      encoding: UTF-8  # 模板文件的编码
+      cache: false  # 在开发时禁用缓存
+
+
     mvc:
       pathmatch:
         matching-strategy: ant_path_matcher

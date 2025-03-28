@@ -148,4 +148,34 @@ public class UserServiceImpl implements UserService {
         return resultMap;
     }
 
+    /**
+     * 激活账号
+     * @param confirmCode
+     * @return
+     */
+    public Map<String, Object> activationAccount(String confirmCode) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+        User user = userMapper.selectUserByConfirmCode(confirmCode);
+        boolean after=LocalDateTime.now().isAfter(user.getActivationTime());
+        if(after) {
+            resultMap.put("code",400);
+            resultMap.put("message","链接已失效,请重新注册");
+            return resultMap;
+
+
+        }
+        int result = userMapper.updateUserByConfirmCode(confirmCode);
+        if (result>0){
+            resultMap.put("code",200);
+            resultMap.put("message","激活成功");
+
+        }else {
+            resultMap.put("code",400);
+            resultMap.put("message","激活失败");
+        }
+        return resultMap;
+
+    }
+
 }

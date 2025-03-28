@@ -115,6 +115,21 @@
             <version>6.2.7.Final</version>
         </dependency>
 
+        <!--利用 Java 的 Bean Validation 规范来校验 Food 对象中的必填字段，这样代码会更加简洁和规范-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
     </dependencies>
 
 

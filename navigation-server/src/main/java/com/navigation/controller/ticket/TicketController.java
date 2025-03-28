@@ -41,7 +41,7 @@ public class TicketController {
 
     //根据景点id查询门票
     @GetMapping("/queryByScenicId")
-    public Ticket queryTicketByScenicId(Integer id){
+    public Result<Ticket> queryTicketByScenicId(Integer id){
         return ticketService.queryByScenicId(id);
     }
 

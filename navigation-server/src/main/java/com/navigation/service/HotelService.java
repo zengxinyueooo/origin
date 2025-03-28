@@ -19,5 +19,5 @@ public interface HotelService extends IService<Hotel> {
     PageResult queryHotel(Integer pageNum, Integer pageSize);
 
 
-    Hotel queryHotelById(Integer id);
+    Result<Hotel> queryHotelById(Integer id);
 }

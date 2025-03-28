@@ -26,4 +26,5 @@ public interface UserService {
      */
     Map<String, Object> LoginUser(LoginDto loginDto);
 
+    Map<String, Object> activationAccount(String confirmCode);
 }

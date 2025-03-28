@@ -19,7 +19,7 @@ public interface FoodService extends IService<Food> {
 
     PageResult queryFood(Integer pageNum, Integer pageSize);
 
-    Food queryFoodById(Integer id);
+    Result<Food> queryFoodById(Integer id);
 
-    List<Food> queryFoodByRegionId(Integer id);
+    Result<List<Food>> queryFoodByRegionId(Integer id);
 }

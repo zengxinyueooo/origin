@@ -18,7 +18,7 @@ public interface TicketReservationService extends IService<TicketReservation> {
     PageResult queryTicketReservation(Integer pageNum, Integer pageSize);
 
 
-    TicketReservation queryTicketReservationById(Integer id);
+    Result<TicketReservation> queryTicketReservationById(Integer id);
 
     Result<Void> confirmPurchase(Integer reservationId);
 }
