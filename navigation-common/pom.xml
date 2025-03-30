@@ -46,6 +46,25 @@
         <artifactId>lombok</artifactId>
     </dependency>
 
+        <!--httpclient-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.78</version>
+        </dependency>
+
+        <dependency> <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+
 <!--    <dependency>-->
 <!--        <groupId>io.springfox</groupId>-->
 <!--        <artifactId>springfox-swagger2</artifactId>-->

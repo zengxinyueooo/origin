@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -24,7 +25,9 @@ public class Scenic {
 
     private String scenicStatus; // 景点开放状态（如开放、关闭）
 
-    private String location; // 景点位置，存储经纬度或具体地址
+    //private String location; // 景点位置，存储经纬度或具体地址
+    private BigDecimal lat;  // 纬度
+    private BigDecimal lng;  // 经度
 
     private String scenicDescription; // 景点介绍
 

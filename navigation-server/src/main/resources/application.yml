@@ -20,25 +20,49 @@ spring:
 
 
     thymeleaf:
-      prefix: classpath:/templates/  # 模板文件存放的路径
-      suffix: .html  # 模板文件的扩展名
-      mode: HTML  # 模板的模式，通常是 HTML
-      encoding: UTF-8  # 模板文件的编码
-      cache: false  # 在开发时禁用缓存
-
+      prefix: classpath:/templates/
+      suffix: .html
+      mode: HTML
+      encoding: UTF-8
+      cache: false
 
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  redis:
+    host: 127.20.10.8
+    port: 6379
+    password: 123456
+    database: 0
+    timeout: 2000
+    jedis:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 2
+        max-wait: 10000
+baidu:
+  yingyan:
+    ak: "aaM0EeonjbNkG4x5dfAlEdlIz04Jso5z"
+    service-id: "241558"
+    base-url: "http://yingyan.baidu.com/api/v3"
+
+http:
+  maxTotal: 300
+  defaultMaxPerRoute: 50
+  connectTimeout: 1000
+  connectionRequestTimeout: 500
+  socketTimeout: 5000
+  staleConnectionCheckEnabled: true
 #logging:
 #  level:
 #    com.navigation: debug
 #  pattern:
 #    dateformat: HH:mm:ss:SSS
-#logging:
-#  level:
-#    root: DEBUG
+logging:
+  level:
+    root: DEBUG
 
 
 
