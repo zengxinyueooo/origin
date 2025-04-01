@@ -23,75 +23,52 @@ import java.util.List;
 @ConfigurationProperties(prefix = "http", ignoreUnknownFields = true)
 public class HttpClientConfig {
 
+    private Integer maxTotal = 100; // 最大连接数
+    private Integer defaultMaxPerRoute = 20; // 每个主机的最大连接数
+    private Integer connectTimeout = 5000; // 连接超时时间
+    private Integer connectionRequestTimeout = 5000; // 请求超时时间
+    private Integer socketTimeout = 10000; // 响应超时时间
 
-    private Integer maxTotal;// 最大连接
-
-    private Integer defaultMaxPerRoute;// 每个host的最大连接
-
-    private Integer connectTimeout;// 连接超时时间
-
-    private Integer connectionRequestTimeout;// 请求超时时间
-
-    private Integer socketTimeout;// 响应超时时间
-
-    /**
-     * HttpClient连接池
-     * @return
-     */
+    /** HttpClient 连接池 */
     @Bean
     public HttpClientConnectionManager httpClientConnectionManager() {
-
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(maxTotal);
         connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
         return connectionManager;
     }
 
-    /**
-     * 注册RequestConfig
-     * @return
-     */
+    /** 请求配置 */
     @Bean
     public RequestConfig requestConfig() {
-
-        return RequestConfig.custom().setConnectTimeout(connectTimeout)
-                .setConnectionRequestTimeout(connectionRequestTimeout).setSocketTimeout(socketTimeout)
+        return RequestConfig.custom()
+                .setConnectTimeout(connectTimeout)
+                .setConnectionRequestTimeout(connectionRequestTimeout)
+                .setSocketTimeout(socketTimeout)
                 .build();
     }
 
-    /**
-     * 注册HttpClient
-     * @param manager
-     * @param config
-     * @return
-     */
+    /** HttpClient */
     @Bean
     public HttpClient httpClient(HttpClientConnectionManager manager, RequestConfig config) {
-
-        return HttpClientBuilder.create().setConnectionManager(manager).setDefaultRequestConfig(config)
+        return HttpClientBuilder.create()
+                .setConnectionManager(manager)
+                .setDefaultRequestConfig(config)
                 .build();
     }
 
+    /** 请求工厂 */
     @Bean
     public ClientHttpRequestFactory requestFactory(HttpClient httpClient) {
-
         return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
-    /**
-     * 使用HttpClient来初始化一个RestTemplate
-     * @param requestFactory
-     * @return
-     */
+
+    /** RestTemplate */
     @Bean
     public RestTemplate restTemplate(ClientHttpRequestFactory requestFactory) {
-
         RestTemplate template = new RestTemplate(requestFactory);
-
-        List<HttpMessageConverter<?>> list = template.getMessageConverters();
-        for (HttpMessageConverter<?> mc : list) {
-
+        for (HttpMessageConverter<?> mc : template.getMessageConverters()) {
             if (mc instanceof StringHttpMessageConverter) {
-
                 ((StringHttpMessageConverter) mc).setDefaultCharset(Charset.forName("UTF-8"));
             }
         }

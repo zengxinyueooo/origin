@@ -2,127 +2,82 @@ package com.navigation.controller.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.navigation.utils.MapUtils;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-/**
- * 高德地图
- */
+
 @RestController
 @RequestMapping("/map")
+@Api(tags = "Map Controller", description = "提供路线规划服务的接口")
 public class MapController {
 
-
-    /**
-     * 日志对象
-     */
     private static final Logger logger = LoggerFactory.getLogger(MapController.class);
 
-    /**
-     * 公交路线规划
-     * http://localhost:8080/map/bus?origin=116.20,39.56&destination=116.22,39.58&city1=110000&city2=110000
-     *
-     * @param origin      起点经纬度
-     * @param destination 目的地
-     * @param city1       起点所在城市
-     * @param city2       目的地所在城市
-     */
+    @ApiOperation(value = "公交路线规划", notes = "根据起点和终点获取公交路线规划")
     @GetMapping("/bus")
-    public String getBus(@RequestParam String origin, @RequestParam String destination,
-                         @RequestParam String city1, @RequestParam String city2) {
-
-        Map<String, String> params = new HashMap<>();
-
-        params.put("origin", origin);
-        params.put("destination", destination);
-        params.put("city1", city1);
-        params.put("city2", city2);
-
-        // 获取包含原始内容的RouteResult
-        MapUtils.RouteResult result = MapUtils.sendGet(MapUtils.WALKING_ROUTE_PLANNING, params);
-        logger.info("请求公交路线规划,返回的结果为:{}", JSONObject.toJSONString(result.getParsedData()));
-        return result.getRawContent();
+    public ResponseEntity<Map<String, Object>> getBus(
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam(required = false) String city1,
+            @RequestParam(required = false) String city2) {
+        return getRoute(MapUtils.BUS_ROUTE_PLANNING, origin, destination, city1, city2, null);
     }
 
-    /**
-     * 步行路线规划
-     * http://localhost:8080/map/walk?origin=116.20,39.56&destination=116.22,39.58&isindoor=0
-     *
-     * @param origin      起点信息
-     * @param destination 目的地信息
-     * @param isindoor    是否需要室内算路    0：不需要  1：需要
-     * @return
-     */
+    @ApiOperation(value = "步行路线规划", notes = "根据起点和终点获取步行路线规划")
     @GetMapping("/walk")
-    public String getWalk(@RequestParam String origin,
-                          @RequestParam String destination,
-                          @RequestParam String isindoor) {
-
-        Map<String, String> params = new HashMap<>();
-        params.put("origin", origin);
-        params.put("destination", destination);
-        params.put("isindoor", isindoor);
-
-        logger.info("步行路线规划,入参请求为:{}", JSONObject.toJSONString(params));
-
-        // 获取包含原始内容的RouteResult
-        MapUtils.RouteResult result = MapUtils.sendGet(MapUtils.WALKING_ROUTE_PLANNING, params);
-
-        // 记录解析后的结果
-        logger.info("步行路线规划,解析结果为:{}", JSONObject.toJSONString(result.getParsedData()));
-
-        // 直接返回原始内容
-        logger.info("步行路线规划,原始响应为:{}", result.getRawContent());
-        return result.getRawContent();
+    public ResponseEntity<Map<String, Object>> getWalk(
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam(required = false) String isindoor,
+            @RequestParam(required = false) String city1,
+            @RequestParam(required = false) String city2) {
+        return getRoute(MapUtils.WALKING_ROUTE_PLANNING, origin, destination, city1, city2, isindoor);
     }
 
-    /**
-     * 驾车路线规划
-     * http://localhost:8080/map/drive?origin=116.20,39.56&destination=116.22,39.58
-     *
-     * @param origin      起点信息
-     * @param destination 目的地信息
-     * @return
-     */
+    @ApiOperation(value = "驾车路线规划", notes = "根据起点和终点获取驾车路线规划")
     @GetMapping("/drive")
-    public String getDrive(@RequestParam String origin, @RequestParam String destination) {
-
-        Map<String, String> params = new HashMap<>();
-
-        params.put("origin", origin);
-        params.put("destination", destination);
-        logger.info("驾车路线规划,入参请求为:{}", JSONObject.toJSONString(params));
-        // 获取包含原始内容的RouteResult
-        MapUtils.RouteResult result = MapUtils.sendGet(MapUtils.WALKING_ROUTE_PLANNING, params);
-        logger.info("驾车路线规划,返回的结果为:{}", JSONObject.toJSONString(result.getParsedData()));
-        return result.getRawContent();
+    public ResponseEntity<Map<String, Object>> getDrive(
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam(required = false) String city1,
+            @RequestParam(required = false) String city2) {
+        return getRoute(MapUtils.DRIVING_ROUTE_PLANNING, origin, destination, city1, city2, null);
     }
 
-    /**
-     * 骑行路线规划
-     * http://localhost:8080/map/riding?origin=116.20,39.56&destination=116.22,39.58
-     *
-     * @param origin      起点信息
-     * @param destination 目的地信息
-     * @return
-     */
+    @ApiOperation(value = "骑行路线规划", notes = "根据起点和终点获取骑行路线规划")
     @GetMapping("/riding")
-    public String getRiding(@RequestParam String origin, @RequestParam String destination) {
+    public ResponseEntity<Map<String, Object>> getRiding(
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam(required = false) String city1,
+            @RequestParam(required = false) String city2) {
+        return getRoute(MapUtils.CYCLING_ROUTE_PLANNING, origin, destination, city1, city2, null);
+    }
 
+    private ResponseEntity<Map<String, Object>> getRoute(String url, String origin, String destination, String city1, String city2, String isindoor) {
         Map<String, String> params = new HashMap<>();
-
         params.put("origin", origin);
         params.put("destination", destination);
-        logger.info("骑行路线规划,入参请求为:{}", JSONObject.toJSONString(params));
-        // 获取包含原始内容的RouteResult
-        MapUtils.RouteResult result = MapUtils.sendGet(MapUtils.WALKING_ROUTE_PLANNING, params);
-        logger.info("骑行路线规划,返回的结果为:{}", JSONObject.toJSONString(result.getParsedData()));
-        return result.getRawContent();
+
+        // 针对步行路线，去掉 city1 和 city2 参数
+        if (!"walking".equals(url)) {
+            if (city1 != null) params.put("city1", city1);
+            if (city2 != null) params.put("city2", city2);
+        }
+
+        if (isindoor != null) params.put("isindoor", isindoor);
+
+        MapUtils.RouteResult result = MapUtils.sendGet(url, params);
+        logger.info("返回结果: {}", JSONObject.toJSONString(result.getParsedData()));
+
+        // 解析 JSON 字符串为 Map
+        Map<String, Object> responseData = JSONObject.parseObject(result.getRawContent(), Map.class);
+        return ResponseEntity.ok(responseData);
     }
+
 }

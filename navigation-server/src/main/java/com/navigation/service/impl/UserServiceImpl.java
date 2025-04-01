@@ -12,6 +12,8 @@ import com.navigation.service.UserService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -158,29 +160,96 @@ public class UserServiceImpl implements UserService {
      * @param confirmCode
      * @return
      */
+//    @RequestMapping(value = "/activation", method = RequestMethod.GET)
+//    public Map<String, Object> activationAccount(String confirmCode) {
+//
+//        Map<String, Object> resultMap = new HashMap<>();
+//
+//        // 检查 confirmCode 是否为空或无效
+//        if (confirmCode == null || confirmCode.isEmpty()) {
+//            resultMap.put("code", 400);
+//            resultMap.put("message", "激活码无效");
+//            return resultMap;
+//        }
+//
+//        // 查询用户信息
+//
+//        User user = userMapper.selectUserByConfirmCode(confirmCode);
+//        System.out.println(confirmCode);
+//        System.out.println("hello world");
+//
+//        if (user == null) {
+//            resultMap.put("code", 400);
+//            resultMap.put("message", "用户未找到");
+//            return resultMap;
+//        }
+//
+//        // 检查激活时间是否过期
+//        boolean isExpired = LocalDateTime.now().isAfter(user.getActivationTime());
+//        if (isExpired) {
+//            resultMap.put("code", 400);
+//            resultMap.put("message", "链接已失效，请重新注册");
+//            return resultMap;
+//        }
+//
+//        // 更新用户激活状态
+//
+//        int result = userMapper.updateUserByConfirmCode(confirmCode);
+//        if (result > 0) {
+//            resultMap.put("code", 200);
+//            resultMap.put("message", "激活成功");
+//        } else {
+//            resultMap.put("code", 400);
+//            resultMap.put("message", "激活失败");
+//        }
+//        return resultMap;
+//    }
+    @RequestMapping(value = "/activation", method = RequestMethod.GET)
     public Map<String, Object> activationAccount(String confirmCode) {
-
         Map<String, Object> resultMap = new HashMap<>();
-        User user = userMapper.selectUserByConfirmCode(confirmCode);
-        boolean after=LocalDateTime.now().isAfter(user.getActivationTime());
-        if(after) {
-            resultMap.put("code",400);
-            resultMap.put("message","链接已失效,请重新注册");
+
+        // 检查 confirmCode 是否为空或无效
+        if (confirmCode == null || confirmCode.isEmpty()) {
+            resultMap.put("code", 400);
+            resultMap.put("message", "激活码无效");
             return resultMap;
-
-
         }
-        int result = userMapper.updateUserByConfirmCode(confirmCode);
-        if (result>0){
-            resultMap.put("code",200);
-            resultMap.put("message","激活成功");
 
-        }else {
-            resultMap.put("code",400);
-            resultMap.put("message","激活失败");
+        // 查询用户信息
+        User user = userMapper.selectUserByConfirmCode(confirmCode);
+        if (user == null) {
+            resultMap.put("code", 400);
+            resultMap.put("message", "用户未找到");
+            return resultMap;
+        }
+//
+//        // 检查用户是否有效（已激活）
+//        if (user.getIsValid()==1) {
+//            resultMap.put("code", 400);
+//            resultMap.put("message", "该账户已激活");
+//            return resultMap;
+//        }
+
+        // 检查激活时间是否过期（假设24小时有效）
+        boolean isExpired = LocalDateTime.now().isAfter(user.getActivationTime().plusHours(24));
+        if (isExpired) {
+            resultMap.put("code", 400);
+            resultMap.put("message", "链接已失效，请重新注册");
+            return resultMap;
+        }
+
+        // 更新用户激活状态
+        int result = userMapper.updateUserByConfirmCode(confirmCode);
+        if (result > 0) {
+            resultMap.put("code", 200);
+            resultMap.put("message", "激活成功");
+        } else {
+            resultMap.put("code", 400);
+            resultMap.put("message", "激活失败，数据库更新错误");
         }
         return resultMap;
-
     }
+
+
 
 }

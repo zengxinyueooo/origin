@@ -23,12 +23,13 @@ public interface UserMapper {
     User selectUserByConfirmCode(@Param("confirmCode") String confirmCode);
 
     /**
-     * 根据确认码查询用户并修改状态值为1（可用）
+     * 根据确认码查询用户并修改状态值为 1（可用），只有在确认码有效且未激活的情况下才进行更新
      * @param confirmCode
      * @return
      */
-    @Update("UPDATE user SET is_valid = 1 WHERE confirm_code = #{confirmCode}")
+    @Update("UPDATE user SET is_valid = 1 WHERE confirm_code = #{confirmCode} AND is_valid = 0")
     int updateUserByConfirmCode(@Param("confirmCode") String confirmCode);
+
 
     /**
      * 根据邮箱查询账户

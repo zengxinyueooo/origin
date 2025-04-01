@@ -53,7 +53,16 @@
         <p>亲爱的用户，</p>
         <p>感谢您注册我们的系统！为了激活您的账户，请点击下面的链接：</p>
 
-        <a th:href="@{${activationUrl}}" class="button">点击激活账号</a>
+        <!-- 激活链接 -->
+        <a th:href="${activationUrl}" class="button"><span th:text="${activationUrl}"></span></a>
+
+
+
+
+
+        <!--        <a th:href="@{http://localhost:8080/users/activation?confirmCode=${activationUrl}}" class="button">点击激活账号</a>-->
+<!--        <a th:href="${activationUrl}" class="button"><span th:text="${activationUrl}"></span></a>-->
+
 
         <p>如果您没有进行此操作，请忽略此邮件。</p>
     </div>

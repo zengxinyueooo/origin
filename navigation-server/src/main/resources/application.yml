@@ -1,5 +1,7 @@
 server:
+  address: 0.0.0.0
   port: 8080
+
 spring:
   datasource:
     druid:
@@ -42,11 +44,7 @@ spring:
         max-idle: 5
         min-idle: 2
         max-wait: 10000
-baidu:
-  yingyan:
-    ak: "aaM0EeonjbNkG4x5dfAlEdlIz04Jso5z"
-    service-id: "241558"
-    base-url: "http://yingyan.baidu.com/api/v3"
+
 
 http:
   maxTotal: 300
@@ -64,6 +62,9 @@ logging:
   level:
     root: DEBUG
 
+
+  jmx:
+    enabled: true
 
 
 
@@ -86,4 +87,5 @@ knife4j:
         api-rule: package
         api-rule-resources:
           com.navigation.controller
+
 

@@ -39,12 +39,8 @@ public class RegisterDto {
     @NotBlank(message = "性别不能为空")
     private String gender;
 
-    @ApiModelProperty(value = "确认码", required = false)
-    private String confirmCode;  // 确认码
+    private String confirmCode;  // 激活码
+    private LocalDateTime activationTime;  // 激活时间
+    private int isValid;  // 账户是否有效（0 表示无效，1 表示有效）
 
-    @ApiModelProperty(value = "激活失效时间", required = false)
-    private LocalDateTime activationTime;  // 激活失效时间
-
-    @ApiModelProperty(value = "账号是否有效", required = false)
-    private Integer isValid;  // 是否有效
 }
