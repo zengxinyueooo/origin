@@ -38,4 +38,7 @@ public interface TicketReservationMapper extends BaseMapper<TicketReservation> {
     // 获取数据库中所有存在的ID列表
     @Select("SELECT reservation_id FROM ticket_reservation")
     List<Integer> getAllExistingIds();
+
+
+    int updateSelective(TicketReservation updateEntity);
 }

@@ -25,7 +25,7 @@ public class ScenicReservation {
     private Integer reservationId; // 预约ID
 
     @NotNull(message = "预约日期不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime reservationDate; // 预约日期
 
     @NotNull(message = "预约人数不能为空")
@@ -34,10 +34,10 @@ public class ScenicReservation {
     @NotNull(message = "是否拥堵不能为空")
     private Integer isCongested; // 是否拥堵（0表示不拥堵，1表示拥堵）
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime createTime; // 创建时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime updateTime; // 更新时间
 
     @NotNull(message = "用户Id不能为空")

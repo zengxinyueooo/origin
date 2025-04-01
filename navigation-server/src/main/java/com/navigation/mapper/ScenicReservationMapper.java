@@ -34,7 +34,7 @@ public interface ScenicReservationMapper extends BaseMapper<ScenicReservation> {
 
     // 获取指定景点的所有预约记录的总人数
     @Select("SELECT SUM(people_count) FROM scenic_reservation WHERE scenic_id = #{scenicId}")
-    int getTotalPeopleCountByScenicId(Integer scenicId);
+    Integer getTotalPeopleCountByScenicId(Integer scenicId);
 
     // 获取数据库中所有存在的ID列表
     @Select("SELECT reservation_id FROM scenic_reservation")

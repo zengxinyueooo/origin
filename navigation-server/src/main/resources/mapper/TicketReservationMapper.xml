@@ -32,4 +32,19 @@
             #{id}
         </foreach>
     </delete>
+
+    <!-- XML映射文件中的SQL定义 -->
+    <update id="updateSelective" parameterType="com.navigation.entity.TicketReservation">
+        UPDATE ticket_reservation
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="ticketId != null">ticket_id = #{ticketId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="reservationTime != null">reservation_time = #{reservationTime},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW() <!-- 确保每次更新都修改时间 -->
+        </set>
+        WHERE reservation_id = #{reservationId}
+    </update>
 </mapper>

@@ -39,18 +39,18 @@ public class Ticket {
     private Integer availability; // 门票剩余数量
 
     @NotNull(message = "门票开放时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime validFrom; // 门票有效期开始时间
 
     @NotNull(message = "门票开放时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime validTo; // 门票有效期结束时间
 
     private String version; // 乐观锁版本号字段
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     LocalDateTime createTime; // 创建时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
      LocalDateTime updateTime; // 修改时间
 }

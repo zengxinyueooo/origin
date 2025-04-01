@@ -15,5 +15,10 @@ public interface TicketService extends IService<Ticket> {
 
     Result<Void> batchDelete(List<Integer> ids);
 
-    Result<Ticket> queryByScenicId(Integer id);
+    Result<List<Ticket>> queryByScenicId(Integer id);
+
+
+    Result<Ticket> queryTicketById(Integer ticketId);
+
+    PageResult queryTicket(Integer page, Integer pageSize);
 }

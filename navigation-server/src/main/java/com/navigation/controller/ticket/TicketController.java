@@ -41,8 +41,20 @@ public class TicketController {
 
     //根据景点id查询门票
     @GetMapping("/queryByScenicId")
-    public Result<Ticket> queryTicketByScenicId(Integer id){
+    public Result<List<Ticket>> queryTicketByScenicId(Integer id){
+
         return ticketService.queryByScenicId(id);
+    }
+    @GetMapping("/queryById")
+    public Result<Ticket> queryTicketById(Integer id){
+        return ticketService.queryTicketById(id);
+    }
+
+    @GetMapping("/query")
+    public PageResult queryTicket(@RequestParam(defaultValue = "1") Integer page,
+                                  @RequestParam(defaultValue = "5") Integer pageSize){
+        //两个参数分别指：从第几页开始查，每页的个数有多少
+        return ticketService.queryTicket(page,pageSize);
     }
 
 }

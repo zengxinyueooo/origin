@@ -22,8 +22,11 @@ public interface TicketMapper extends BaseMapper<Ticket> {
     int batchDelete(@Param("ids") List<Integer> ids);
 
 
-    @Select("select * from Ticket where scenic_spot_id = #{id}")
+    @Select("select * from Ticket where id = #{id}")
     Ticket queryTicketById(Integer id);
+
+    @Select("select * from Ticket where scenic_spot_id = #{scenicSpotId}")
+    List<Ticket> queryTicketByScenicId(Integer id);
 
     @Update("UPDATE ticket " +
             "SET availability = availability - #{num} " +
@@ -44,4 +47,6 @@ public interface TicketMapper extends BaseMapper<Ticket> {
     @Update("UPDATE ticket SET availability = #{availability} WHERE id = #{id}")
     int updateTicketStock(Ticket ticket);
 
+    @Select("select * from ticket")
+    List<Ticket> queryTicket(Integer pageNum, Integer pageSize);
 }

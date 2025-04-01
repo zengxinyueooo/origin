@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
   @TableName("region")
   public class Region {
       @TableId(value = "region_id", type = IdType.AUTO)
-      private int regionId;
+      private Integer regionId;
 
       @NotBlank(message = "地区名称不能为空")
       private String regionName;
@@ -28,10 +28,10 @@ import java.time.LocalDateTime;
       private String regionDescription;
 
 
-      @JsonFormat(pattern = "YYYY-MM-dd")
+      @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
       LocalDateTime createTime;
 
-      @JsonFormat(pattern = "YYYY-MM-dd")
+      @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
       LocalDateTime updateTime;
 
   }

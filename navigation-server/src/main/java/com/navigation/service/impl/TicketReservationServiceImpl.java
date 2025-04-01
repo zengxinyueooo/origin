@@ -43,6 +43,7 @@ public class TicketReservationServiceImpl extends ServiceImpl<TicketReservationM
     private Validator validator;
 
     @Override
+    @Transactional
     public Result<Void> saveTicketReservation(TicketReservation ticketReservation) {
         // 参数校验
         if (ticketReservation == null) {
@@ -51,7 +52,7 @@ public class TicketReservationServiceImpl extends ServiceImpl<TicketReservationM
         }
 
         // 从UserHolder获取userId并设置到ticketReservation对象
-        Integer userId = BaseContext.getUserId();
+        Integer userId = 1; // BaseContext.getUserId();
         ticketReservation.setUserId(userId);
 
         // 检查用户是否存在
@@ -78,6 +79,13 @@ public class TicketReservationServiceImpl extends ServiceImpl<TicketReservationM
         if (buyNumber == null) {
             log.error("购买数量为空，无法计算总价");
             return Result.error("购买数量不能为空");
+        }
+
+        // 新增：检查用户是否已经预约过该门票
+        boolean existsReservation = ticketReservationMapper.existsByUserIdAndTicketId(userId, ticketId);
+        if (existsReservation) {
+            log.error("用户ID: {} 已经预约过门票ID: {}，不能重复预约", userId, ticketId);
+            return Result.error("您已经预约过该门票，不能重复预约");
         }
 
         // 计算总价
@@ -122,52 +130,128 @@ public class TicketReservationServiceImpl extends ServiceImpl<TicketReservationM
 
     @Override
     public Result<Void> update(TicketReservation ticketReservation) {
-        if (ticketReservation == null) {
-            log.error("传入的 TicketReservation 对象为空，无法更新景点预约信息");
-            return Result.error("传入的景点预约信息为空");
-        }
-
         try {
-            // 从BaseContext获取当前用户ID
-            Integer userId = BaseContext.getUserId();
+            // 基础校验
+            if (ticketReservation == null) {
+                log.error("传入的预约信息为空");
+                return Result.error("预约信息不能为空");
+            }
+
+            // 强制要求reservationId
+            Integer reservationId = ticketReservation.getReservationId();
+            if (reservationId == null) {
+                log.error("缺少必要参数reservationId");
+                return Result.error("必须提供预约订单ID");
+            }
+
+            // 获取当前用户ID
+            Integer userId = 1; // BaseContext.getUserId();
             if (userId == null) {
-                log.error("无法获取当前用户ID，更新操作失败");
-                return Result.error("无法获取当前用户ID，请检查");
+                log.error("用户未登录");
+                return Result.error("请先登录");
             }
 
-            // 获取传入的门票ID
-            Integer ticketId = ticketReservation.getTicketId();
-            if (ticketId == null) {
-                log.error("传入的门票ID为空，无法定位预约订单");
-                return Result.error("传入的门票ID为空，请检查");
+            // 获取原始预约记录
+            TicketReservation originalReservation = ticketReservationMapper.queryTicketReservationById(reservationId);
+            if (originalReservation == null) {
+                log.error("预约记录不存在，reservationId: {}", reservationId);
+                return Result.error("预约记录不存在");
             }
 
-            // 检查该用户对该门票是否已存在预约记录
-            boolean isExist = ticketReservationMapper.existsByUserIdAndTicketId(userId, ticketId);
-            if (isExist) {
-                log.error("用户ID: {} 已存在对门票ID: {} 的预约记录，不允许重复预约", userId, ticketId);
-                return Result.error("您已预约过该门票，不允许重复预约");
+            // 校验用户权限
+            if (!originalReservation.getUserId().equals(userId)) {
+                log.error("用户{}尝试修改他人预约记录{}", userId, reservationId);
+                return Result.error("无权修改该预约记录");
             }
 
-            // 获取原预订数量和当前预订数量
-            TicketReservation originalTicketReservation = ticketReservationMapper.queryTicketReservationById(ticketReservation.getTicketId());
-            Integer originalQuantity = originalTicketReservation.getQuantity();
-            Integer currentQuantity = ticketReservation.getQuantity();
+            // 新门票ID校验（如果传入了新的ticketId）
+            Integer newTicketId = ticketReservation.getTicketId();
+            if (newTicketId != null) {
+                // 检查新门票是否存在
+                Ticket newTicket = ticketMapper.queryTicketById(newTicketId);
+                if (newTicket == null) {
+                    log.error("指定门票不存在，ticketId: {}", newTicketId);
+                    return Result.error("选择的门票不存在");
+                }
 
-            if (!originalQuantity.equals(currentQuantity)) {
-                // 预订数量改变，重新计算总价
-                Ticket ticket = ticketMapper.queryTicketById(ticketId);
-                BigDecimal ticketPrice = ticket.getPrice();
-                BigDecimal totalPrice = ticketPrice.multiply(new BigDecimal(currentQuantity));
-                ticketReservation.setTotalPrice(totalPrice);
+                // 如果修改了门票ID，需要检查是否重复预约（同一用户同门票只能有一条）
+                boolean exists = ticketReservationMapper.existsByUserIdAndTicketId(userId, newTicketId);
+                if (exists) {
+                    log.error("用户{}已存在门票{}的预约", userId, newTicketId);
+                    return Result.error("您已预约过该门票");
+                }
             }
 
-            ticketReservation.setUpdateTime(LocalDateTime.now());
-            ticketReservationMapper.update(ticketReservation);
+            // 构建更新对象
+            TicketReservation updateEntity = new TicketReservation();
+            updateEntity.setReservationId(reservationId);
+
+            // 字段更新逻辑
+            boolean needUpdate = false;
+
+            // 1. 处理数量变更
+            Integer newQuantity = ticketReservation.getQuantity();
+            if (newQuantity != null && newQuantity > 0) {
+                if (!newQuantity.equals(originalReservation.getQuantity())) {
+                    updateEntity.setQuantity(newQuantity);
+                    needUpdate = true;
+                }
+            }
+
+            // 2. 处理预约时间变更
+            LocalDateTime newReservationTime = ticketReservation.getReservationTime();
+            if (newReservationTime != null) {
+                if (!newReservationTime.equals(originalReservation.getReservationTime())) {
+                    updateEntity.setReservationTime(newReservationTime);
+                    needUpdate = true;
+                }
+            }
+
+            // 3. 处理门票ID变更
+            if (newTicketId != null && !newTicketId.equals(originalReservation.getTicketId())) {
+                updateEntity.setTicketId(newTicketId);
+                needUpdate = true;
+            }
+
+            // 无有效修改时提前返回
+            if (!needUpdate) {
+                log.warn("未检测到有效修改，reservationId: {}", reservationId);
+                return Result.error("未提交任何有效修改");
+            }
+
+            // 重新计算总价（以下情况需要计算）:
+            // - 修改了门票ID（价格可能不同）
+            // - 修改了数量
+            boolean needRecalculate = updateEntity.getTicketId() != null || updateEntity.getQuantity() != null;
+            if (needRecalculate) {
+                // 获取最终使用的门票信息
+                Ticket finalTicket = updateEntity.getTicketId() != null ?
+                        ticketMapper.queryTicketById(updateEntity.getTicketId()) :
+                        ticketMapper.queryTicketById(originalReservation.getTicketId());
+
+                // 获取最终使用的数量
+                Integer finalQuantity = updateEntity.getQuantity() != null ?
+                        updateEntity.getQuantity() :
+                        originalReservation.getQuantity();
+
+                BigDecimal totalPrice = finalTicket.getPrice().multiply(new BigDecimal(finalQuantity));
+                updateEntity.setTotalPrice(totalPrice);
+            }
+
+            // 设置更新时间
+            updateEntity.setUpdateTime(LocalDateTime.now());
+
+            // 执行更新
+            int affectedRows = ticketReservationMapper.updateSelective(updateEntity);
+            if (affectedRows == 0) {
+                log.error("数据库更新失败，reservationId: {}", reservationId);
+                return Result.error("更新失败，请稍后重试");
+            }
+
             return Result.success();
         } catch (Exception e) {
-            log.error("更新景点预约信息时出现异常", e);
-            throw new RuntimeException(e);
+            log.error("预约更新异常", e);
+            return Result.error("系统异常，请稍后重试");
         }
     }
 

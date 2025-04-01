@@ -3,6 +3,7 @@ package com.navigation.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.navigation.context.BaseContext;
@@ -15,14 +16,17 @@ import com.navigation.result.PageResult;
 import com.navigation.result.Result;
 import com.navigation.service.ScenicReservationService;
 import com.navigation.service.ScenicService;
+import com.navigation.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +47,9 @@ public class ScenicReservationServiceImpl extends ServiceImpl<ScenicReservationM
     @Autowired
     private Validator validator;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public Result<Void> saveScenicReservation(ScenicReservation scenicReservation) {
         // 参数校验
@@ -54,28 +61,74 @@ public class ScenicReservationServiceImpl extends ServiceImpl<ScenicReservationM
         // 从UserHolder获取userId并设置到scenicReservation对象
         Integer userId = BaseContext.getUserId();
         scenicReservation.setUserId(userId);
+        //scenicReservation.setUserId(1);
 
         if (scenicReservation.getScenicId() == null) {
             log.error("景点ID为空，无法保存景点预约信息");
             return Result.error("景点ID为空");
         }
-
-        // 获取景点最大承载量
-        Integer scenicId = scenicReservation.getScenicId();
-        int maxCapacity = scenicMapper.getMaxCapacityByScenicId(scenicId);
-        if (maxCapacity <= 0) {
-            log.error("景点ID: {} 对应的最大承载量数据异常", scenicId);
-            return Result.error("景点最大承载量数据异常，请检查");
+        // 判断peopleCount是否为空
+        if (scenicReservation.getPeopleCount() == null) {
+            log.error("预约人数为空，无法保存景点预约信息");
+            return Result.error("预约人数为空");
         }
 
-        // 获取该景点所有预约记录的总人数
-        int totalPeopleCount = scenicReservationMapper.getTotalPeopleCountByScenicId(scenicId);
-        // 判断是否拥堵
-        int total = scenicReservation.getPeopleCount() + totalPeopleCount;
-        if (total >= maxCapacity * 0.8) {
-            scenicReservation.setIsCongested(1);
-        } else {
-            scenicReservation.setIsCongested(0);
+        // 判断reservationDate是否为空
+        if (scenicReservation.getReservationDate() == null) {
+            log.error("预约日期为空，无法保存景点预约信息");
+            return Result.error("预约日期为空");
+        }
+
+        Integer scenicId = scenicReservation.getScenicId();
+
+        // 检查该用户对该景点是否已存在预约记录
+        boolean isExist = scenicReservationMapper.existsByUserIdAndScenicId(userId, scenicId);
+        if (isExist) {
+            log.error("用户ID: {} 已存在对景点ID: {} 的预约记录，不允许重复预约", userId, scenicId);
+            return Result.error("您已预约过该景点，不允许重复预约");
+        }
+
+        try {
+            // 从Redis中查询景点信息
+            String pattern = "scenic:" + scenicId + ":*";
+            Set<String> keys = stringRedisTemplate.keys(pattern);
+            if (keys.isEmpty()) {
+                log.error("未在Redis中找到景点Id为 {} 的记录", scenicId);
+                return Result.error("未在Redis中找到对应的景点记录");
+            }
+
+            String key = keys.iterator().next();
+            String scenicJson = stringRedisTemplate.opsForValue().get(key);
+            // 复用JsonUtils中配置好的ObjectMapper实例
+            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+            Scenic scenic = objectMapper.readValue(scenicJson, Scenic.class);
+            if (scenic == null || scenic.getId() == null) {
+                log.error("从Redis获取的景点数据不完整或格式错误");
+                return Result.error("从Redis获取的景点数据不完整或格式错误");
+            }
+
+            // 获取景点最大承载量
+            int maxCapacity = scenic.getMaxCapacity();
+            if (maxCapacity <= 0) {
+                log.error("景点ID: {} 对应的最大承载量数据异常", scenicId);
+                return Result.error("景点最大承载量数据异常，请检查");
+            }
+
+            // 获取该景点所有预约记录的总人数
+            Integer totalPeopleCount = scenicReservationMapper.getTotalPeopleCountByScenicId(scenicId);
+            if (totalPeopleCount == null) {
+                totalPeopleCount = 0; // 设置默认值为0，可根据实际情况调整
+            }
+            // 判断是否拥堵
+            int total = scenicReservation.getPeopleCount() + totalPeopleCount;
+            if (total >= maxCapacity * 0.8) {
+                scenicReservation.setIsCongested(1);
+            } else {
+                scenicReservation.setIsCongested(0);
+            }
+        } catch (IOException e) {
+            log.error("反序列化景点数据时出现异常", e);
+            return Result.error("反序列化景点数据时出现异常");
         }
 
         // 使用Validator校验除userId和scenicId外的其他字段
@@ -98,6 +151,7 @@ public class ScenicReservationServiceImpl extends ServiceImpl<ScenicReservationM
             log.error("保存景点预约信息时出现异常", e);
             return Result.error("保存景点预约信息失败，请稍后重试");
         }
+
     }
 
     @Override
@@ -107,6 +161,12 @@ public class ScenicReservationServiceImpl extends ServiceImpl<ScenicReservationM
             return Result.error("传入的景点预约信息为空");
         }
 
+        // 必须传递reservationId，进行校验
+        if (scenicReservation.getReservationId() == null) {
+            log.error("reservationId为空，无法进行更新操作");
+            return Result.error("reservationId为空，请检查");
+        }
+
         try {
             // 从UserHolder获取当前用户ID
             Integer userId = BaseContext.getUserId();
@@ -114,12 +174,21 @@ public class ScenicReservationServiceImpl extends ServiceImpl<ScenicReservationM
                 log.error("无法获取当前用户ID，更新操作失败");
                 return Result.error("无法获取当前用户ID，请检查");
             }
+            //scenicReservation.setUserId(1);
 
             // 获取传入的景点ID
             Integer scenicId = scenicReservation.getScenicId();
             if (scenicId == null) {
-                log.error("传入的景点ID为空，无法定位预约订单");
-                return Result.error("传入的景点ID为空，请检查");
+                scenicReservation.setUpdateTime(LocalDateTime.now());
+                scenicReservationMapper.update(scenicReservation);
+                return Result.success();
+            }
+
+            // 从Redis中检查scenicId是否存在
+            Set<String> keys = stringRedisTemplate.keys("scenic:" + scenicId + ":*");
+            if (keys.isEmpty()) {
+                log.info("Redis中不存在景点ID为 {} 的记录，不进行数据库更新", scenicId);
+                return Result.error("景点id不存在");
             }
 
             // 检查该用户对该景点是否已存在预约记录
@@ -127,12 +196,12 @@ public class ScenicReservationServiceImpl extends ServiceImpl<ScenicReservationM
             if (isExist) {
                 log.error("用户ID: {} 已存在对景点ID: {} 的预约记录，不允许重复预约", userId, scenicId);
                 return Result.error("您已预约过该景点，不允许重复预约");
+            } else {
+                // 没有找到相同userid和scenicid的记录，进行参数更改操作
+                scenicReservation.setUpdateTime(LocalDateTime.now());
+                scenicReservationMapper.update(scenicReservation);
+                return Result.success();
             }
-
-            // 更新预约信息（将传入的信息覆盖到已存在的订单上）
-            scenicReservation.setUpdateTime(LocalDateTime.now());
-            scenicReservationMapper.update(scenicReservation);
-            return Result.success();
         } catch (Exception e) {
             log.error("更新景点预约信息时出现异常", e);
             return Result.error("更新景点预约信息失败，请稍后重试");

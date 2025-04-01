@@ -35,16 +35,16 @@ public class TicketReservation {
     private Integer quantity; // 预定的数量
 
     @NotNull(message = "预定时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime reservationTime; // 门票要预定的时间点
 
     private Integer status; // 预定状态，0表示未支付
 
     private BigDecimal totalPrice; // 总金额
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime createTime; // 创建时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime updateTime; // 修改时间
 }

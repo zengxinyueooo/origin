@@ -7,14 +7,17 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.navigation.entity.Food;
 import com.navigation.entity.Food;
+import com.navigation.entity.Region;
 import com.navigation.mapper.FoodMapper;
 import com.navigation.mapper.FoodMapper;
 import com.navigation.result.PageResult;
 import com.navigation.result.Result;
 import com.navigation.service.FoodService;
 import com.navigation.service.FoodService;
+import com.navigation.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +41,9 @@ public class FoodServiceImpl extends ServiceImpl<FoodMapper, Food> implements Fo
     @Autowired
     private Validator validator;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public Result<Void> saveFood(Food food) {
         // 参数校验
@@ -45,11 +51,9 @@ public class FoodServiceImpl extends ServiceImpl<FoodMapper, Food> implements Fo
             log.error("传入的 Food 对象为空，无法保存美食信息");
             return Result.error("传入的美食信息为空");
         }
-
-
         Set<ConstraintViolation<Food>> violations = validator.validate(food);
         if (!violations.isEmpty()) {
-            StringBuilder errorMessage = new StringBuilder("以下必填参数未传入: ");
+            StringBuilder errorMessage = new StringBuilder("以下必填参数未传入：");
             for (ConstraintViolation<Food> violation : violations) {
                 errorMessage.append(violation.getMessage()).append("; ");
             }
@@ -57,6 +61,29 @@ public class FoodServiceImpl extends ServiceImpl<FoodMapper, Food> implements Fo
             return Result.error(errorMessage.toString());
         }
 
+        Integer regionId = food.getRegionId();
+        if (regionId != null) {
+            // 构建Redis键名模式
+            String pattern = "region:" + regionId + ":*";
+            Set<String> keys = stringRedisTemplate.keys(pattern);
+            if (keys.isEmpty()) {
+                log.error("未在Redis中找到regionId为 {} 的地区记录", regionId);
+                return Result.error("未找到对应的地区记录，无法保存美食信息");
+            }
+            try {
+                // 假设只有一个键匹配（实际可能需处理多个匹配情况）
+                String key = keys.iterator().next();
+                String regionJson = stringRedisTemplate.opsForValue().get(key);
+                // 这里可以对regionJson进行进一步校验，比如非空等
+                // 假设反序列化成功
+                // （实际中需处理反序列化异常等情况）
+                // Region region = JsonUtils.fromJson(regionJson, Region.class);
+                // 这里只是简单确认regionId有效，实际可按需完善
+            } catch (Exception e) {
+                log.error("从Redis获取地区信息时出错，错误信息: {}", e.getMessage());
+                return Result.error("获取地区信息失败，无法保存美食信息");
+            }
+        }
         try {
             food.setCreateTime(LocalDateTime.now());
             food.setUpdateTime(LocalDateTime.now());
@@ -78,32 +105,30 @@ public class FoodServiceImpl extends ServiceImpl<FoodMapper, Food> implements Fo
         try {
             // 检查 food_id 是否存在
             Integer foodId = food.getFoodId();
-            if (foodId != null) {
-                Food existingFood = foodMapper.queryFoodById(foodId);
-                if (existingFood == null) {
-                    log.error("food_id为 {} 的美食记录不存在", foodId);
-                    return Result.error("food_id为 " + foodId + " 的美食不存在");
-                }
-            } else {
+            if (foodId == null) {
                 log.error("传入的 Food 对象中 food_id 为空");
                 return Result.error("传入的 Food 对象中 food_id 为空");
             }
-
-            // 检查地区id是否存在
-            Integer regionId = food.getRegionId();
-            if (regionId != null) {
-                int num = foodMapper.countFoodById(regionId);
-                if (num == 0) {
-                    log.error("地区id为 {} 的地区记录不存在", regionId);
-                    return Result.error("地区id为 " + regionId + " 的地区记录不存在");
-                }
-            } else {
-                log.error("传入的 Food 对象中地区id 为空");
-                return Result.error("传入的 Food 对象中地区id 为空");
+            Food existingFood = foodMapper.queryFoodById(foodId);
+            if (existingFood == null) {
+                log.error("food_id为 {} 的美食记录不存在", foodId);
+                return Result.error("food_id为 " + foodId + " 的美食不存在");
             }
 
-            food.setUpdateTime(LocalDateTime.now());
-            foodMapper.update(food);
+            // 检查地区id是否存在并处理更新
+            Integer regionId = food.getRegionId();
+            if (regionId != null) {
+                String pattern = "region:" + regionId + ":*";
+                Set<String> keys = stringRedisTemplate.keys(pattern);
+                if (keys.isEmpty()) {
+                    log.error("地区id为 {} 的地区记录在Redis中不存在", regionId);
+                    return Result.error("地区id为 " + regionId + " 的地区记录不存在");
+                }
+                existingFood.setRegionId(regionId);
+            }
+
+            existingFood.setUpdateTime(LocalDateTime.now());
+            foodMapper.update(existingFood);
             return Result.success();
         } catch (Exception e) {
             log.error("更新美食信息时出现异常", e);
@@ -192,12 +217,26 @@ public class FoodServiceImpl extends ServiceImpl<FoodMapper, Food> implements Fo
             log.error("传入的区域ID为空");
             return Result.error("id为空！");
         }
-        int num = foodMapper.countFoodById(id);
-        if(num == 0){
-            return Result.error("地区Id为空！");
+
+        // 构建匹配键的模式
+        String pattern = "region:" + id + ":*";
+        Set<String> keys = stringRedisTemplate.keys(pattern);
+        if (keys.isEmpty()) {
+            log.error("未在Redis中找到区域Id为 {} 的记录", id);
+            return Result.error("未在Redis中找到对应的区域记录");
         }
 
         try {
+            // 假设只有一个键匹配（实际可能需处理多个匹配情况）
+            String key = keys.iterator().next();
+            String regionJson = stringRedisTemplate.opsForValue().get(key);
+            Region region = JsonUtils.fromJson(regionJson, Region.class);
+            if (region == null || region.getRegionId() == null) {
+                log.error("从Redis获取的区域数据不完整或格式错误");
+                return Result.error("从Redis获取的区域数据不完整或格式错误");
+            }
+
+            // 从数据库查询美食信息
             List<Food> foodList = foodMapper.queryFoodByRegionId(id);
             return Result.success(foodList);
         } catch (Exception e) {
