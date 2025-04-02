@@ -30,13 +30,12 @@ public interface UserMapper {
     @Update("UPDATE user SET is_valid = 1 WHERE confirm_code = #{confirmCode} AND is_valid = 0")
     int updateUserByConfirmCode(@Param("confirmCode") String confirmCode);
 
-
     /**
      * 根据邮箱查询账户
+     * 对于普通用户，is_valid 必须为 1；对于管理员账户无需激活状态的限制
      * @param email
      * @return
      */
-    @Select("SELECT * FROM user WHERE email = #{email} AND is_valid = 1")
+    @Select("SELECT * FROM user WHERE email = #{email} AND (is_valid = 1 OR role = 'admin')")
     User selectUserByEmail(@Param("email") String email);
-
 }
