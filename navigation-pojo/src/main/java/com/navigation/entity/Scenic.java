@@ -31,18 +31,18 @@ public class Scenic {
 
     private String scenicDescription; // 景点介绍
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime createTime; // 创建时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime updateTime; // 更新时间
 
     private Integer maxCapacity; // 最大承载人数
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime openStartTime; // 开放时间起始时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime openEndTime; // 开放时间结束时间
 
     private Integer regionId; // 地区ID

@@ -25,10 +25,10 @@ public class Ticket {
 
     private Integer availability; // 门票剩余数量
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime validFrom; // 门票有效期开始时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime validTo; // 门票有效期结束时间
 
     private String version; // 乐观锁版本号字段

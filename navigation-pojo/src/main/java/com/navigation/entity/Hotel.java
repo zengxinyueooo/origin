@@ -27,9 +27,9 @@ public class Hotel {
     private String description; // 酒店描述，提供更多酒店信息和特点
 
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime createTime; // 创建时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime updateTime; // 修改时间
 }

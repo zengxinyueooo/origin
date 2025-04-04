@@ -18,9 +18,9 @@ public class Route {
     private Integer userId;  // 关联的用户ID
     private String routeData;  // 存储整个路径信息的 JSON 字段
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime createTime; // 创建时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime updateTime; // 修改时间
 }

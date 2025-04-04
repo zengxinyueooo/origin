@@ -30,17 +30,17 @@ public class User {
 
     private String gender; // 用户性别
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime activationTime; // 账号激活失效时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime createTime; // 账号注册时间
 
     private Integer isValid; // 账号是否有效（0：不可用，1：可以用）
 
     private String confirmCode; // 确认码，用于用户注册或验证
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy年MM月dd日 HH:mm", timezone = "GMT+8")
     private LocalDateTime updateTime; // 账号修改时间
 
     private String head; // 用户头像
