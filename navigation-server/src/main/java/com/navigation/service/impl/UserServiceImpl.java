@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 登录成功，生成 JWT 令牌
-        String token = JwtUtils.generateToken(user.getEmail(), user.getRole());
+        String token = JwtUtils.generateToken(user.getUserId(), user.getRole());
         resultMap.put("code", 200);
         resultMap.put("message", "登录成功");
         resultMap.put("token", token);
@@ -197,4 +197,63 @@ public class UserServiceImpl implements UserService {
         }
         return resultMap;
     }
+
+    /**通过 userId获取用户信息
+     *
+     * @param token
+     * @return
+     */
+    public Map<String, Object> getUserProfile(String token) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 获取用户 ID
+            Integer userId = JwtUtils.getUserId(token);
+
+            if (userId == null) {
+                resultMap.put("status", "failure");
+                resultMap.put("message", "无效的 Token");
+                return resultMap;
+            }
+
+            // 通过 userId 获取用户信息
+            User user = userMapper.selectUserById(userId);
+
+            if (user != null) {
+                resultMap.put("status", "success");
+                resultMap.put("message", "获取成功");
+                resultMap.put("user", user);
+            } else {
+                resultMap.put("status", "failure");
+                resultMap.put("message", "用户未找到");
+            }
+        } catch (Exception e) {
+            resultMap.put("status", "failure");
+            resultMap.put("message", "获取用户信息失败");
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+    /**
+     * 用户自己修改个人信息
+     * @param user 包含用户ID和要更新的字段（昵称、性别、年龄、头像、密码）
+     * @return 是否更新成功
+     */
+    @Override
+    public boolean updateUserPersonalInfo(User user) {
+        try {
+            // 设置更新时间为当前时间
+            user.setUpdateTime(LocalDateTime.now());
+
+            // 调用 Mapper 更新用户个人信息
+            int result = userMapper.updateUserPersonalInfo(user);
+
+            // 如果更新成功，返回 true
+            return result > 0;
+        } catch (Exception e) {
+            e.printStackTrace(); // 打印异常信息
+            return false; // 发生异常时返回 false
+        }
+    }
+
 }

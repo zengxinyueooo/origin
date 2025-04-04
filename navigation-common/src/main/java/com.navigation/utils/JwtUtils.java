@@ -1,17 +1,16 @@
 package com.navigation.utils;
 
 import io.jsonwebtoken.*;
-
 import java.util.Date;
 
 public class JwtUtils {
     private static final String SECRET_KEY = "mySecretKey"; // 秘钥
     private static final long EXPIRATION_TIME = 86400000; // 1天有效期
 
-    // 生成 Token
-    public static String generateToken(String userId, String role) {
+    // 生成 Token，使用 Integer 类型的 userId
+    public static String generateToken(Integer userId, String role) {
         return Jwts.builder()
-                .setSubject(userId.toString())  // 主题：用户ID
+                .setSubject(userId.toString())
                 .claim("role", role)            // 存储角色（user / admin）
                 .setIssuedAt(new Date())        // 签发时间
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 过期时间
@@ -28,28 +27,17 @@ public class JwtUtils {
                     .getBody();
             System.out.println("解析 JWT 成功：" + claims);
             return claims;
-        } catch (ExpiredJwtException e) {
-            System.err.println("JWT 已过期");
-            e.printStackTrace();
-        } catch (UnsupportedJwtException e) {
-            System.err.println("不支持的 JWT");
-            e.printStackTrace();
-        } catch (MalformedJwtException e) {
-            System.err.println("JWT 格式错误");
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            System.err.println("JWT 签名错误");
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            System.err.println("JWT 为空或解析错误");
+        } catch (Exception e) {
+            System.err.println("解析 JWT 失败，原始 Token: " + token);
             e.printStackTrace();
         }
         return null; // 解析失败返回 null
     }
 
-    // 获取用户ID
+    // 获取用户ID（通过 Token 中的 subject 获取用户ID）
     public static Integer getUserId(String token) {
         Claims claims = parseToken(token);
+        // 解析成功时，将 userId 转换为 Integer 类型并返回
         return claims != null ? Integer.parseInt(claims.getSubject()) : null;
     }
 

@@ -38,4 +38,31 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM user WHERE email = #{email} AND (is_valid = 1 OR role = 'admin')")
     User selectUserByEmail(@Param("email") String email);
+
+    /**
+     * 根据id查询账户
+     * @param userId
+     * @return
+     */
+    @Select("SELECT * FROM user WHERE user_id = #{userId}")
+    User selectUserById(@Param("userId") Integer userId);
+
+    /**
+     * 更新用户个人信息（支持动态更新）
+     * @param user 用户信息
+     * @return 更新操作影响的行数
+     */
+    @Update("<script>" +
+            "UPDATE user " +
+            "<set>" +
+            "<if test='nickName != null'>nick_name = #{nickName},</if>" +
+            "<if test='age != null'>age = #{age},</if>" +
+            "<if test='gender != null'>gender = #{gender},</if>" +
+            "<if test='head != null'>head = #{head},</if>" +
+            "<if test='password != null'>password = #{password},</if>" +
+            "update_time = #{updateTime} " +  // 设置更新时间为当前时间
+            "</set>" +
+            "WHERE user_id = #{userId}" +  // 使用 userId 替换 id
+            "</script>")
+    int updateUserPersonalInfo(User user);
 }

@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.*;
 public interface AdminUserServiceMapper {
 
     /**
-     * 根据邮箱或昵称进行条件查询并分页展示
+     * 管理员根据邮箱或昵称进行条件查询并分页展示，排除管理员
      */
     @Select("<script>" +
             "SELECT user_id, nick_name, email, gender, create_time, is_valid " +
@@ -16,24 +16,28 @@ public interface AdminUserServiceMapper {
             "WHERE 1=1 " +
             "<if test='email != null and email != &quot;&quot;'> AND email LIKE CONCAT('%', #{email}, '%') </if>" +
             "<if test='nickName != null and nickName != &quot;&quot;'> AND nick_name LIKE CONCAT('%', #{nickName}, '%') </if>" +
+            "AND role != 'admin' " +
             "ORDER BY create_time DESC" +
-            "</script>")
+                    "</script>")
     Page<User> findUsersByCondition(@Param("email") String email, @Param("nickName") String nickName);
 
     /**
-     * 查询所有用户信息并分页，按账号创建时间排序
+     * 管理员查询所有用户信息并分页，按账号创建时间排序，排除管理员
      */
     @Select("SELECT user_id, nick_name, email, gender, create_time, is_valid " +
             "FROM user " +
+            "WHERE role != 'admin' " +
             "ORDER BY create_time DESC")
     Page<User> findAllUsers();
+
     /**
-     * 根据用户ID删除用户
+     * 管理员根据用户ID删除用户
      */
     @Delete("DELETE FROM user WHERE user_id = #{userId}")
     int deleteById(@Param("userId") Integer userId);
+
     /**
-     * 根据用户ID更新用户的昵称、性别、年龄、是否有效状态、角色和更新时间
+     * 管理员根据用户ID更新用户的昵称、性别、年龄、是否有效状态、角色和更新时间
      */
     @Update("<script>" +
             "UPDATE user " +
@@ -48,5 +52,4 @@ public interface AdminUserServiceMapper {
             "WHERE user_id = #{user.userId}" +
             "</script>")
     int updateUser(@Param("user") User user);
-
 }

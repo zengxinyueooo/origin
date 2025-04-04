@@ -2,19 +2,23 @@ package com.navigation.controller.user;
 
 import com.navigation.dto.LoginDto;
 import com.navigation.dto.RegisterDto;
+import com.navigation.entity.User;
 import com.navigation.service.UserService;
+import com.navigation.utils.JwtUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/users")
-@Api(tags = "账号登录注册激活操作管理")
+@Api(tags = "用户账号管理")
 public class UserController {
 
     @Autowired
@@ -77,7 +81,71 @@ public class UserController {
             @ApiResponse(code = 401, message = "Token 无效或已过期")
     })
     public Map<String, Object> getUserProfile(@RequestHeader("Authorization") String token) {
-        // 此处可通过工具类解析 token 并返回对应用户信息，示例仅返回 token 信息
-        return Map.of("status", "success", "message", "Token 有效", "token", token);
+        try {
+            // 解析 token 获取用户 ID
+            Integer userId = JwtUtils.getUserId(token);
+
+            if (userId == null) {
+
+                return Map.of("status", "failure", "message", "Token 无效或已过期");
+            }
+
+            // 调用服务层获取用户信息
+            Map<String, Object> userProfile = userService.getUserProfile(token);
+
+            if ("success".equals(userProfile.get("status"))) {
+                return userProfile;  // 返回获取的用户信息
+            } else {
+                return Map.of("status", "failure", "message", "用户信息未找到");
+            }
+        } catch (Exception e) {
+            System.out.println("异常信息：" + e.getMessage());
+            e.printStackTrace();
+            System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+            return Map.of("status", "failure", "message", "Token 无效或已过期");
+        }
     }
+
+
+    /**
+     * 用户自己修改个人信息
+     * @param user 包含用户ID和要更新的字段（昵称、性别、年龄、头像、密码）
+     * @return 是否更新成功
+     */
+    @PutMapping("/update")
+    @ApiOperation(value = "用户修改个人信息", notes = "用户修改自己的昵称、性别、年龄、头像、密码等信息")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "修改成功", response = Map.class),
+            @ApiResponse(code = 400, message = "修改失败")
+    })
+    public Map<String, Object> updateUserPersonalInfo(
+            @RequestBody @ApiParam(value = "修改个人信息请求数据", required = true) User user,
+            @RequestHeader("Authorization") String token) {
+
+        try {
+            // 解析 token 获取用户 ID
+            Integer userId = JwtUtils.getUserId(token);  // 获取 Integer 类型的 userId
+
+            if (userId == null) {
+                return Map.of("status", "failure", "message", "Token 无效或已过期");
+            }
+
+            // 确保修改的是当前用户的个人信息
+            if (userId == null || !userId.equals(user.getUserId())) {
+                return Map.of("status", "failure", "message", "无法修改其他用户的信息");
+            }
+
+            // 调用服务层进行更新
+            boolean isUpdated = userService.updateUserPersonalInfo(user);
+            if (isUpdated) {
+                return Map.of("status", "success", "message", "修改成功");
+            } else {
+                return Map.of("status", "failure", "message", "修改失败");
+            }
+        } catch (Exception e) {
+            return Map.of("status", "failure", "message", "Token 无效或已过期");
+        }
+    }
+
+
 }

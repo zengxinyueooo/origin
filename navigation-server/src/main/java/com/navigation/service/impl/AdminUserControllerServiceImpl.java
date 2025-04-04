@@ -18,7 +18,7 @@ public class AdminUserControllerServiceImpl implements AdminUserService {
     private AdminUserServiceMapper adminUserServiceMapper;
 
     /**
-     * 根据条件（邮箱或昵称）进行分页查询
+     * 管理员根据条件（邮箱或昵称）进行分页查询
      */
     @Override
     public PageInfo<User> getUsersByCondition(int pageNum, int pageSize, String email, String nickName) {
@@ -33,7 +33,7 @@ public class AdminUserControllerServiceImpl implements AdminUserService {
     }
 
     /**
-     * 查询所有用户并分页，按账号创建时间排序
+     * 管理员查询所有用户并分页，按账号创建时间排序
      */
     @Override
     public PageInfo<User> getAllUsers(int pageNum, int pageSize) {
@@ -47,7 +47,7 @@ public class AdminUserControllerServiceImpl implements AdminUserService {
         return new PageInfo<>(userList);
     }
     /**
-     * 根据用户ID删除用户
+     * 管理员根据用户ID删除用户
      * @param userId 用户ID
      * @return 是否删除成功
      */
@@ -63,7 +63,7 @@ public class AdminUserControllerServiceImpl implements AdminUserService {
         }
     }
     /**
-     * 根据用户ID修改用户的昵称、性别、年龄、是否有效状态和角色
+     * 管理员根据用户ID修改用户的昵称、性别、年龄、是否有效状态和角色
      * 自动更新时间戳
      * @param user 包含用户ID和要更新的字段（昵称、性别、年龄、是否有效状态、角色）
      * @return 是否更新成功
@@ -84,4 +84,5 @@ public class AdminUserControllerServiceImpl implements AdminUserService {
             return false; // 发生异常时返回 false
         }
     }
+
 }

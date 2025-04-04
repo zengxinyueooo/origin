@@ -3,8 +3,10 @@ package com.navigation.service;
 import com.navigation.dto.LoginDto;
 import com.navigation.dto.RegisterDto;
 import com.navigation.entity.User;
-import java.util.Map;
+import org.springframework.stereotype.Service;
 
+import java.util.Map;
+@Service
 public interface UserService {
 
     /**
@@ -41,4 +43,21 @@ public interface UserService {
      * @return 操作结果及附加信息，如激活成功、失败、链接失效等
      */
     Map<String, Object> activationAccount(String confirmCode);
+    /**
+     * 获取用户个人资料
+     * <p>
+     * 根据 JWT Token 获取当前用户的个人信息。
+     * </p>
+     *
+     * @param token JWT 令牌
+     * @return 用户资料
+     */
+    Map<String, Object> getUserProfile(String token);
+    /**
+     * 用户自己修改个人信息，包括昵称、年龄、性别、头像、密码
+     * 自动更新修改操作时间
+     * @param user 包含用户ID和要更新的字段（昵称、性别、年龄、头像、密码）
+     * @return 是否更新成功
+     */
+    boolean updateUserPersonalInfo(User user);
 }
