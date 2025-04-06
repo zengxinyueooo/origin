@@ -5,7 +5,7 @@ import com.navigation.entity.User;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
-public interface AdminUserServiceMapper {
+public interface AdminUserMapper {
 
     /**
      * 管理员根据邮箱或昵称进行条件查询并分页展示，排除管理员
