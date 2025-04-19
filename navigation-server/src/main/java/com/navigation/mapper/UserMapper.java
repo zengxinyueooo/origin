@@ -3,8 +3,20 @@ package com.navigation.mapper;
 import com.navigation.entity.User;
 import org.apache.ibatis.annotations.*;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 @Mapper
 public interface UserMapper {
+    /**
+     * 根据邮箱查询账户
+     * 不限制账户是否激活或角色
+     * @param email
+     * @return
+     */
+    @Select("SELECT * FROM user WHERE email = #{email}")
+    User selectUserByEmail1(@Param("email") String email);
+
     /**
      * 新增账号
      * @param user
@@ -59,10 +71,28 @@ public interface UserMapper {
             "<if test='age != null'>age = #{age},</if>" +
             "<if test='gender != null'>gender = #{gender},</if>" +
             "<if test='head != null'>head = #{head},</if>" +
-            "<if test='password != null'>password = #{password},</if>" +
-            "update_time = #{updateTime} " +  // 设置更新时间为当前时间
+            "update_time = #{updateTime} " +
             "</set>" +
-            "WHERE user_id = #{userId}" +  // 使用 userId 替换 id
+            "WHERE user_id = #{userId}" +
             "</script>")
     int updateUserPersonalInfo(User user);
+
+    /**
+     * 修改用户密码
+     * @param user 用户对象（包含 userId 和新密码）
+     * @return 更新成功的记录数
+     */
+    @Update("UPDATE user SET password = #{password}, update_time = #{updateTime} WHERE user_id = #{userId}")
+    int updateUserPassword(User user);
+
+    @Update("UPDATE user " +
+            "SET confirm_code = #{confirmCode}, " +
+            "activation_time = #{activationTime}, " +
+            "is_valid = #{isValid}, " +
+            "password = #{password}, " +
+            "salt = #{salt}, " +
+            "update_time = #{updateTime} " +
+            "WHERE email = #{email}")
+    void updateUserForReRegister(User existingUser);
+
 }

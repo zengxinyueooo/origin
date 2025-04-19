@@ -37,7 +37,7 @@ public class RegisterDto {
     @ApiModelProperty(value = "性别 (M: 男, F: 女)", required = false)
     @NotBlank(message = "性别不能为空")
     private String gender;
-
+    private String role;
     private String confirmCode;  // 激活码
     private LocalDateTime activationTime;  // 激活时间
     private int isValid;  // 账户是否有效（0 表示无效，1 表示有效）

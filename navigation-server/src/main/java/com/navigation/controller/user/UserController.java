@@ -1,15 +1,17 @@
 package com.navigation.controller.user;
+import com.navigation.utils.JwtUtils;
 
 import com.navigation.dto.LoginDto;
 import com.navigation.dto.RegisterDto;
 import com.navigation.entity.User;
+import com.navigation.result.Result;
 import com.navigation.service.UserService;
-import com.navigation.utils.JwtUtils;
+
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,7 +30,7 @@ public class UserController {
      * 用户登录（支持管理员和普通用户，登录成功返回 JWT Token）
      */
     @PostMapping("/login")
-    @ApiOperation(value = "用户登录", notes = "用户输入账号密码进行登录，支持管理员直接使用明文密码登录")
+    @ApiOperation(value = "用户登录", notes = "用户输入账号、密码和角色进行登录，角色为 user 或 admin")
     @ApiResponses({
             @ApiResponse(code = 200, message = "登录成功，返回 token", response = Map.class),
             @ApiResponse(code = 400, message = "登录失败，账号或密码错误")
@@ -37,6 +39,7 @@ public class UserController {
             @RequestBody @ApiParam(value = "登录请求数据", required = true) LoginDto loginDto) {
         return userService.LoginUser(loginDto);
     }
+
 
     /**
      * 用户注册（仅适用于普通用户）
@@ -101,7 +104,7 @@ public class UserController {
         } catch (Exception e) {
             System.out.println("异常信息：" + e.getMessage());
             e.printStackTrace();
-            System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
             return Map.of("status", "failure", "message", "Token 无效或已过期");
         }
     }
@@ -146,6 +149,36 @@ public class UserController {
             return Map.of("status", "failure", "message", "Token 无效或已过期");
         }
     }
+    @PutMapping("/updatePassword")
+    @ApiOperation(value = "修改用户密码", notes = "用户或管理员需要输入旧密码和新密码")
+    public Result<?> updatePassword(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword) {
+
+        try {
+            Integer userId = JwtUtils.getUserId(token);
+            String role = JwtUtils.getUserRole(token);
+
+            if (userId == null || role == null) {
+                return Result.error("Token 无效或已过期");
+            }
+
+
+            if (!"user".equals(role) && !"admin".equals(role)) {
+                return Result.error("无权限操作，非法角色身份");
+            }
+
+            boolean isUpdated = userService.updateUserPassword(userId, oldPassword, newPassword);
+            return isUpdated ? Result.success("密码修改成功") : Result.error("旧密码错误或修改失败");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("修改过程中发生错误");
+        }
+    }
+
+
 
 
 }

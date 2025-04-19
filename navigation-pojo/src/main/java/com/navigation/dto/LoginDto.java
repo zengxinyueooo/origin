@@ -22,4 +22,5 @@ public class LoginDto {
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank(message = "密码不能为空")
     private String password;  // 用户登录密码
+    private String role;
 }

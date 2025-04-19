@@ -60,4 +60,17 @@ public interface UserService {
      * @return 是否更新成功
      */
     boolean updateUserPersonalInfo(User user);
+    /**
+     * 用户修改密码
+     * @param userId 用户ID
+     * @param oldPassword 原密码
+     * @param newPassword 新密码
+     * @return 是否修改成功
+     */
+    boolean updateUserPassword(Integer userId, String oldPassword, String newPassword);
+
+
+
+
+
 }
